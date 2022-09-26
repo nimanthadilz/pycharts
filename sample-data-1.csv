@@ -1,0 +1,15 @@
+Continent,Country,City,Value
+Asia,"Sri Lanaka",Negombo,100
+Asia,"Sri Lanaka",Colombo,300
+Asia,India,Mumbai,200
+Asia,India,Chennai,150
+Asia,Pakistan,Dhaka,450
+Asia,Pakistan,Karachi,250
+Europe,German,Berlin,150
+Europe,German,Munich,300
+Europe,German,Frankfurt,400
+Europe,Italy,Rome,50
+Europe,Italy,Florence,280
+Europe,Italy,Venice,190
+Australia,Australia,Melbourne
+Australia,Australia,Victoria,299
