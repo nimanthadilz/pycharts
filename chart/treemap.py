@@ -60,13 +60,20 @@ class Treemap(BaseChart):
         else:
             raise ValueError("Invalid node value")
     
-    def __pad_rectangles(self, rects, pad=2):
+    def __pad_rectangles(self, rects, pad=4):
         for rect in rects:
             rect["x"] += pad
             rect["dx"] -= 2*pad
             rect["y"] += pad
             rect["dy"] -= 2*pad
         return rects
+
+    def __get_node_name(self, node):
+        if type(node) != tuple:
+            raise ValueError("Argument node is not a tuple")
+
+        node_name = node[0]
+        return node_name
 
     def __get_node_value(self, node):
         if type(node) != tuple:
@@ -81,73 +88,72 @@ class Treemap(BaseChart):
         else:
             raise ValueError("Invalid node value")
     
-    def __normalize_sizes(self, sizes, dx, dy):
+    def __normalize_sizes(self, named_sizes, dx, dy):
         """Normalize list of values.
 
         Normalizes a list of numeric values so that `sum(sizes) == dx * dy`.
 
         Parameters
         ----------
-        sizes : list-like of numeric values
-            Input list of numeric values to normalize.
+        named_sizes : list of tuples with (name, size)
+            Input list of nodes to normalize.
         dx, dy : numeric
             The dimensions of the full rectangle to normalize total values to.
 
         Returns
         -------
-        list[numeric]
+        list[tupe(name, value)]
             The normalized values.
         """
-        total_size = sum(sizes)
+        total_size = sum(node[1] for node in named_sizes)
         total_area = dx * dy
-        sizes = map(float, sizes)
-        sizes = map(lambda size: size * total_area / total_size, sizes)
-        return list(sizes)
+        named_sizes = map(lambda node: (node[0], float(node[1]) * total_area / total_size), named_sizes)
+        return list(named_sizes)
 
-    def __layoutrow(self, sizes, x, y, dx, dy):
+    def __layoutrow(self, named_sizes, x, y, dx, dy):
         # generate rects for each size in sizes
         # dx >= dy
         # they will fill up height dy, and width will be determined by their area
         # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
-        covered_area = sum(sizes)
+        covered_area = sum(node[1] for node in named_sizes)
         width = covered_area / dy
         rects = []
-        for size in sizes:
-            rects.append({"x": x, "y": y, "dx": width, "dy": size / width})
+        for name, size in named_sizes:
+            rects.append({"name": name, "x": x, "y": y, "dx": width, "dy": size / width})
             y += size / width
         return rects
 
 
-    def __layoutcol(self, sizes, x, y, dx, dy):
+    def __layoutcol(self, named_sizes, x, y, dx, dy):
         # generate rects for each size in sizes
         # dx < dy
         # they will fill up width dx, and height will be determined by their area
         # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
-        covered_area = sum(sizes)
+        covered_area = sum(node[1] for node in named_sizes)
         height = covered_area / dx
         rects = []
-        for size in sizes:
-            rects.append({"x": x, "y": y, "dx": size / height, "dy": height})
+        for name, size in named_sizes:
+            rects.append({"name": name, "x": x, "y": y, "dx": size / height, "dy": height})
             x += size / height
         return rects
 
 
-    def __layout(self, sizes, x, y, dx, dy):
+    def __layout(self, named_sizes, x, y, dx, dy):
         return (
-            self.__layoutrow(sizes, x, y, dx, dy) if dx >= dy else self.__layoutcol(sizes, x, y, dx, dy)
+            self.__layoutrow(named_sizes, x, y, dx, dy) if dx >= dy else self.__layoutcol(named_sizes, x, y, dx, dy)
         )
 
-    def __worst_ratio(self, sizes, x, y, dx, dy): 
+    def __worst_ratio(self, named_sizes, x, y, dx, dy): 
         return max(
             [
                 max(rect["dx"] / rect["dy"], rect["dy"] / rect["dx"])
-                for rect in self.__layout(sizes, x, y, dx, dy)
+                for rect in self.__layout(named_sizes, x, y, dx, dy)
             ]
         )
 
-    def __leftoverrow(self, sizes, x, y, dx, dy):
+    def __leftoverrow(self, named_sizes, x, y, dx, dy):
         # compute remaining area when dx >= dy
-        covered_area = sum(sizes)
+        covered_area = sum(node[1] for node in named_sizes)
         width = covered_area / dy
         leftover_x = x + width
         leftover_y = y
@@ -156,9 +162,9 @@ class Treemap(BaseChart):
         return (leftover_x, leftover_y, leftover_dx, leftover_dy)
 
 
-    def __leftovercol(self, sizes, x, y, dx, dy):
+    def __leftovercol(self, named_sizes, x, y, dx, dy):
         # compute remaining area when dx >= dy
-        covered_area = sum(sizes)
+        covered_area = sum(node[1] for node in named_sizes)
         height = covered_area / dx
         leftover_x = x
         leftover_y = y + height
@@ -167,14 +173,14 @@ class Treemap(BaseChart):
         return (leftover_x, leftover_y, leftover_dx, leftover_dy)
 
 
-    def __leftover(self, sizes, x, y, dx, dy):
+    def __leftover(self, named_sizes, x, y, dx, dy):
         return (
-            self.__leftoverrow(sizes, x, y, dx, dy)
+            self.__leftoverrow(named_sizes, x, y, dx, dy)
             if dx >= dy
-            else self.__leftovercol(sizes, x, y, dx, dy)
+            else self.__leftovercol(named_sizes, x, y, dx, dy)
         )
 
-    def __squarify(self, sizes, x, y, dx, dy):
+    def __squarify(self, named_sizes, x, y, dx, dy):
         """Compute treemap rectangles.
 
         Given a set of values, computes a treemap layout in the specified geometry
@@ -198,22 +204,22 @@ class Treemap(BaseChart):
             Each dict in the returned list represents a single rectangle in the
             treemap. The order corresponds to the input order.
         """
-        sizes = list(map(float, sizes))
+        named_sizes = list(map(lambda x: (x[0], float(x[1])), named_sizes))
 
-        if len(sizes) == 0:
+        if len(named_sizes) == 0:
             return []
 
-        if len(sizes) == 1:
-            return self.__layout(sizes, x, y, dx, dy)
+        if len(named_sizes) == 1:
+            return self.__layout(named_sizes, x, y, dx, dy)
 
         # figure out where 'split' should be
         i = 1
-        while i < len(sizes) and self.__worst_ratio(sizes[:i], x, y, dx, dy) >= self.__worst_ratio(
-            sizes[: (i + 1)], x, y, dx, dy
+        while i < len(named_sizes) and self.__worst_ratio(named_sizes[:i], x, y, dx, dy) >= self.__worst_ratio(
+            named_sizes[: (i + 1)], x, y, dx, dy
         ):
             i += 1
-        current = sizes[:i]
-        remaining = sizes[i:]
+        current = named_sizes[:i]
+        remaining = named_sizes[i:]
 
         (leftover_x, leftover_y, leftover_dx, leftover_dy) = self.__leftover(current, x, y, dx, dy)
         return self.__layout(current, x, y, dx, dy) + self.__squarify(
@@ -226,13 +232,13 @@ class Treemap(BaseChart):
         if type(node_value) != tuple:
             return []
 
-        sizes = []
+        named_sizes = []
         for child in node_value:
-            sizes.append(self.__get_node_value(child))
-        sizes = self.__normalize_sizes(sizes, dx, dy)
-        sizes.sort(reverse=True)
+            named_sizes.append(( self.__get_node_name(child), self.__get_node_value(child)))
+        named_sizes = self.__normalize_sizes(named_sizes, dx, dy)
+        named_sizes.sort(key=lambda x: x[1] , reverse=True)
 
-        rectangles = self.__squarify(sizes, x, y, dx, dy)
+        rectangles = self.__squarify(named_sizes, x, y, dx, dy)
         if pad:
             return self.__pad_rectangles(rectangles, dx, dy)
         return rectangles
@@ -244,6 +250,7 @@ class Treemap(BaseChart):
         y = [rect["y"] for rect in rectangles]
         dx = [rect["dx"] for rect in rectangles]
         dy = [rect["dy"] for rect in rectangles]
+        names = [rect["name"] for rect in rectangles]
 
         if colorable:
             cmap = matplotlib.cm.get_cmap("winter")
@@ -251,6 +258,9 @@ class Treemap(BaseChart):
             ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=cmap(random.random()), align="edge")
         else:
             ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
+        
+        for i in range(len(rectangles)):
+            ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i])
         
         ax.set_xlim(0, 100)
         ax.set_ylim(0, 100)
