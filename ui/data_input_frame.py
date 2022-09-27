@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import E, W, ttk
 from tkinter import filedialog as fd
 import os
-from exceptions import ParseError
 
 class DataInputFrame:
     def __init__(self, root, app):
