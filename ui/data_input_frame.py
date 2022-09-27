@@ -38,8 +38,9 @@ class DataInputFrame:
         file_types = (("CSV files", "*.csv"), ("All files", "*.*"))
 
         file_obj = fd.askopenfile(filetypes=file_types)
-        self._set_file_name(os.path.basename(file_obj.name))
-        self.file_obj = file_obj
+        if file_obj != None:
+            self._set_file_name(os.path.basename(file_obj.name))
+            self.file_obj = file_obj
 
     def _set_file_name(self, name):
         self.file_name.set(name)
