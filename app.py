@@ -18,30 +18,30 @@ class App:
         root.option_add("*tearOff", tk.FALSE)
 
         # Menubar
-        menubar = tk.Menu(root)
-        root['menu'] = menubar
-        menuFile = tk.Menu(menubar)
+        menu_bar = tk.Menu(root)
+        root['menu'] = menu_bar
+        menu_file = tk.Menu(menu_bar)
         # File menu
-        menubar.add_cascade(menu=menuFile, label="File")
-        menuFile.add_command(label="New", command=self.menu_action, underline=0)
-        menuFile.add_command(label="Exit", command=self.menu_action, underline=0)
+        menu_bar.add_cascade(menu=menu_file, label="File")
+        menu_file.add_command(label="New", command=self.menu_action, underline=0)
+        menu_file.add_command(label="Exit", command=self.menu_action, underline=0)
         # Help menu
-        menuHelp = tk.Menu(menubar)
-        menubar.add_cascade(menu=menuHelp, label="Help")
-        menuHelp.add_command(label="Tutorial", command=self.menu_action, underline=0)
-        menuHelp.add_command(label="About", command=self.menu_action, underline=0)
+        menu_help = tk.Menu(menu_bar)
+        menu_bar.add_cascade(menu=menu_help, label="Help")
+        menu_help.add_command(label="Tutorial", command=self.menu_action, underline=0)
+        menu_help.add_command(label="About", command=self.menu_action, underline=0)
 
-        mainFrame = ttk.Frame(root, padding="3 3 12 12")
-        mainFrame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        main_frame = ttk.Frame(root, padding="3 3 12 12")
+        main_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
 
-        self.sidebar = Sidebar(mainFrame, self)
-        self.output = Output(mainFrame)
+        self.sidebar = Sidebar(main_frame, self)
+        self.output = Output(main_frame)
 
         root.rowconfigure(0, weight=1)
         root.columnconfigure(0, weight=1)
-        mainFrame.rowconfigure(0, weight=1, minsize=500)
-        mainFrame.columnconfigure(0, weight=3, minsize=800)
-        mainFrame.columnconfigure(1, weight=1, minsize=300)
+        main_frame.rowconfigure(0, weight=1, minsize=500)
+        main_frame.columnconfigure(0, weight=3, minsize=800)
+        main_frame.columnconfigure(1, weight=1, minsize=300)
 
     def menu_action(self):
         print("Menu itme clicked")
