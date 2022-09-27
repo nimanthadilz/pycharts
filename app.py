@@ -3,7 +3,7 @@ from tkinter import ttk
 from exceptions import ParseError
 from ui.sidebar import Sidebar
 from ui.output import Output
-from parser import Parser
+from input_parser import Parser
 from chart_generator import ChartGenerator
 from ui.message_handler import MessageHandler
 
