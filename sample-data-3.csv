@@ -1,14 +1,23 @@
-Countries,
-Countries.Asia,
-"Countries.Asia.Sri Lanka",
-"Countries.Asia.Sri Lanka.Negombo",100
-"Countries.Asia.Sri Lanka.Colombo",280
-Countries.Asia.India,
-Countries.Asia.India.Mumbai,200
-Countries.Asia.India.Chennai,380
-Countries.Europe,
-Countries.Europe.Germany,
-Countries.Europe.Germany.Frankfurt,128
-Countries.Europe.Italy,
-Countries.Europe.Italy.Venice,110
-Countries.Europe.Italy.Rome,82
+name,value
+pycharts,
+pycharts.app,2
+pycharts.chart_generator,3
+pycharts.exceptions,2
+pycharts.input_parser,5
+pycharts.chart,
+pycharts.chart.__init1__,9
+pycharts.chart.ichart,22
+pycharts.chart.treemap,11
+pycharts.ui,
+pycharts.ui.__init2__,23
+pycharts.ui.data_input_frame,11
+pycharts.ui.message_handler,12
+pycharts.ui.output,18
+pycharts.ui.sidebar,21
+pycharts.utils,
+pycharts.utils.__init3__,5
+pycharts.utils.utils1,14
+pycharts.requirements,10
+pycharts.sample-data-1,20
+pycharts.sample-data-2,10
+pycharts.sample-data-3,20
