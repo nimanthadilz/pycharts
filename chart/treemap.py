@@ -253,9 +253,8 @@ class Treemap(BaseChart):
         names = [rect["name"] for rect in rectangles]
 
         if colorable:
-            cmap = matplotlib.cm.get_cmap("winter")
-            # color = [cmap(random.random()) for i in range(len(rectangles))]
-            ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=cmap(random.random()), align="edge")
+            color = (random.random(), random.random(), random.random())
+            ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=color, align="edge")
         else:
             ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
         
