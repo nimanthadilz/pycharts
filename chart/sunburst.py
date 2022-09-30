@@ -15,6 +15,29 @@ STRING_DELIM = "/"
 Angles = collections.namedtuple("Angles", ["theta1", "theta2"])
 
 class Sunburst(BaseChart):
+    """
+    The class to represent the sunburst chart type.
+    
+    Attributes
+    ----------
+    data: dictionary of type "Node" : (Value, "Parent")
+    axes:
+    origin: coordinates of the center of the chart of type (float, float)
+    cmap: controls the coloring based on the angle
+    base_ring_width: default width of a wedge as float
+    base_edge_color: default edge color of a wedge as tuple 
+    base_line_width: default line width of a wedge as float
+    plot_center: plot a circle in the center as boolean
+    plot_minimal_angle: plot only wedges if the angle is bigger than plot_minimal_angle as float
+    label_minimal_angle: label only wedges if the angle is bigger than plot_minimal_angle as float
+    order: to change the order of the converted pathvalue dictionary as a string
+        syntax = "keep" | "value" | "key" and "reversed"
+        keep    : keep the order of the dictionary
+        value   : sort values in the ascending order
+        key     : sort paths alphabetically
+        reversed: take any syntax from above options and reverse it
+    base_textbox_props: properties of the testbos that annonating the wedge corresponding to the path
+    """
     def __init__(self,
                 data,
                 axes: Optional[plt.axes] = None,
@@ -63,8 +86,10 @@ class Sunburst(BaseChart):
         self._structured_paths = []  # type: List[List[List[Path]]]
         self._angles = {}  # type: Dict[Path, Angles]
 
-        #Output
+        # Output
         self.wedges = {}  # type: Dict[Path, Wedge]
+        
+        # Plot the chart 
         self.__plot(setup_axes=True)
     
     def get_figure(self):
@@ -72,6 +97,35 @@ class Sunburst(BaseChart):
         
     # ===============================================================================================
     def __get_parent_key(self, data:dict,  node: str):
+        """
+        Returns the directory of a node from the root as a string
+        
+        e.g.
+        data = {
+            "Root" : (None, None),
+            "Grand Parent1" : (None, "Root"),
+            "Parent1" : (None, "Grand Parent1"),
+            "Child1" : (10, "Parent1"),
+            "Parent2" : (None, "Grand Parent1"),
+            "Child2" : (15, "Parent2"),
+            "Grand Parent2" : (None, "Root"),
+            "Parent3" : (None, "Grand Parent2"),
+            "Child3" : (22, "Parent3"),
+        }
+        
+        node = "Child1"
+        
+        function returns "Root/Grand Parent1/Parent1"
+        
+        Parameters
+        -----------
+        data: dictionary of type "node": (Value, "Parent")
+        node: the node that has to find the directory
+            
+        Returns
+        -------
+        String
+        """
         root_node = get_root_node_key(data)
         for key, value in data.items():
             if key == node:
@@ -81,6 +135,37 @@ class Sunburst(BaseChart):
                     return str(value[1])
     
     def __convert_data(self, data:dict):
+        """
+        Returns a dictionary of type [String, Float]
+        
+        e.g.
+        data = {
+            "Root" : (None, None),
+            "Grand Parent1" : (None, "Root"),
+            "Parent1" : (None, "Grand Parent1"),
+            "Child1" : (10, "Parent1"),
+            "Parent2" : (None, "Grand Parent1"),
+            "Child2" : (15, "Parent2"),
+            "Grand Parent2" : (None, "Root"),
+            "Parent3" : (None, "Grand Parent2"),
+            "Child3" : (22, "Parent3"),
+        }
+        
+        function returns
+        {
+            'Root/Grand Parent1/Parent1/Child1': 10, 
+            'Root/Grand Parent1/Parent2/Child2': 15, 
+            'Root/Grand Parent2/Parent3/Child3': 22
+        }
+        
+        Parameters
+        ----------
+        data: dictionary of type "node": (Value, "Parent")
+
+        Returns
+        -------
+        dictionary[Str, Float]
+        """
         modified_data = {}
         for key, value in data.items():
             if value[0] != None:
@@ -90,6 +175,27 @@ class Sunburst(BaseChart):
     # ===============================================================================================
 
     def __dict_to_pv(self, data: dict, delim=STRING_DELIM):
+        """
+        Returns a dictionary of type [Path, float]
+        
+        e.g.
+        data = {
+            "Root/Grand Parent1/Parent1/Child1": 10,
+            "Root/Grand Parent1/Parent2/Child2": 15,
+            "Root/Grand Parent2/Parent3/Child3": 22,
+        }
+        
+        function returns
+        {
+            Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )): 10, 
+            Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )): 15, 
+            Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )): 22
+        }
+        
+        Parameters
+        data: dictionary of type Path: Value
+        delim: split the items i
+        """
         assert all(isinstance(item, str) for item in data.keys())
         return {Path(item.split(delim)): value for item, value in data.items()}
     # ===============================================================================================
