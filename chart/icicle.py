@@ -129,6 +129,3 @@ class Icicle(BaseChart):
         index = 1
 
         self.__draw_fellow_rectangles(keys,index)
-
-        # display plot
-        plt.show()

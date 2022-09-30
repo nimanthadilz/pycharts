@@ -1,4 +1,5 @@
 from chart.treemap import Treemap
+from chart.icicle import Icicle
 
 class ChartGenerator:
     def __init__(self):
@@ -11,4 +12,7 @@ class ChartGenerator:
             case "Treemap":
                 treemap = Treemap(data)
                 figure = treemap.get_figure()
+            case "Icicle":
+                icicle = Icicle(data)
+                figure = icicle.get_figure()
         return figure
