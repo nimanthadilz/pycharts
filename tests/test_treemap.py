@@ -46,7 +46,16 @@ class TestTreemap(unittest.TestCase):
         pp = pprint.PrettyPrinter()
         pp.pprint(converted_data)
         self.assertEqual(converted_data, expected_data)
+
+    def test_calculate_node_value_1(self):
+        key_list = ["Documents", "School", "Assignment", "Personal", "CV"]
+        return_value = self.treemap._Treemap__calculate_node_value("CV", key_list)
+        self.assertEqual(return_value, 200)
     
+    def test_calculate_node_value_2(self):
+        key_list = ["Documents", "School", "Assignment", "Personal", "CV"]
+        return_value = self.treemap._Treemap__calculate_node_value("School", key_list)
+        self.assertEqual(return_value, (("Assignment", 100),))
 
 if __name__ == "__main__":
     unittest.main()
