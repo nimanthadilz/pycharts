@@ -1,4 +1,5 @@
 import unittest
+from matplotlib.figure import Figure
 from chart.treemap import Treemap
 
 class TestTreemap(unittest.TestCase):
@@ -14,6 +15,11 @@ class TestTreemap(unittest.TestCase):
 
     def test_get_node_value(self):
         self.assertEqual(self.treemap._Treemap__get_node_value(("node1", 23)), 23, "Should equal 23")
+
+    def test_get_figure(self):
+        self.assertTrue(isinstance(self.treemap.get_figure(), Figure))
+
+    
 
 if __name__ == "__main__":
     unittest.main()
