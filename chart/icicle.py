@@ -11,21 +11,45 @@ class Icicle(BaseChart):
         self.__configure_chart()
         self.draw_chart()
 
-    def __configure_chart(self,left_color="#8B008B", right_color="#FF00FF", element_width=1.5,
-                 chart_height=20):
+    def __configure_chart(self, left_color="#8B008B", right_color="#FF00FF", element_width=1.5,
+                          chart_height=20):
+        '''
+            sets the chart height, width and color range for the chart.
+            Parameters:
+                left_color(String): first color of the color range
+                right_color(String): second color of the color range
+                element_width(float): width of a single rectangle
+                chart_height(int): height of the chart
+        '''
         self._maxHeight = chart_height  # overall height of the chart
         self._width = element_width  # width of a single rectangle
         self._color_l = left_color  # user input
         self._color_r = right_color  # user input
 
+    def __configure_plot(self):
+        '''
+            creates the plot
+        '''
+        self.figure, self.ax = plt.subplots()  # define Matplotlib figure and axis
+        self.ax.get_xaxis().set_visible(False)  # hide x-axis
+        self.ax.get_yaxis().set_visible(False)  # hide y-axis
+        self.ax.set_axis_off()
+        self.ax.plot()
+
     def get_figure(self):
+        '''
+            returns the figure object
+        '''
         return self.figure
 
-    def __get_updated_value(self,keys,current_parent, current_node):
+    def __get_updated_value(self, keys, current_parent, current_node):
         return self.data[keys[keys.index(current_parent)]][0] + current_node[0] if \
-                        self.data[keys[keys.index(current_parent)]][0] != None else current_node[0]
+            self.data[keys[keys.index(current_parent)]][0] != None else current_node[0]
 
     def __convert_data(self):
+        '''
+            calculates the overall values for every key in the data dictionary
+        '''
         keys = list(self.data.keys())
         self._max = -1000000000000000000
         self._min = sys.maxsize
@@ -51,25 +75,37 @@ class Icicle(BaseChart):
         self._min = self.data[keys[0]][0] if self._min > self.data[keys[0]][0] else self._min
 
     def __calculate_color(self, value):
+        '''
+            returns the color responding to the given value
+        '''
         # converting the colors into int
         color_l = int(self._color_l[1:], 16)
         color_r = int(self._color_r[1:], 16)
 
-        # calculate the color responding to the given value
         return "#" + str(
             hex(int((color_r * (value - self._min) + color_l * (self._max - value)) / (self._max - self._min)))[2:])
 
-    def __configure_plot(self):
-        self.figure, self.ax = plt.subplots()  # define Matplotlib figure and axis
-        self.ax.get_xaxis().set_visible(False)  # hide x-axis
-        self.ax.get_yaxis().set_visible(False)  # hide y-axis
-        self.ax.set_axis_off()
-        self.ax.plot()
-
-    def __add_rectangle(self,start_x, start_y, width, height, color):
-        self.ax.add_patch(Rectangle((start_x, start_y), width, height, fill=True, edgecolor="white", linewidth=1, facecolor=color))
+    def __add_rectangle(self, start_x, start_y, width, height, color):
+        '''
+            adds a rectangular shape in to the plot.
+            Parmeters:
+                start_x: x value of the starting coordinate
+                start_y: y value of the starting coordinate
+                width: width of a single rectangle
+                height: height of a single rectangle
+                color: color of the rectangle
+        '''
+        self.ax.add_patch(
+            Rectangle((start_x, start_y), width, height, fill=True, edgecolor="white", linewidth=1, facecolor=color))
 
     def __get_parent_nodes(self, index, keys, item):
+        '''
+            returns the details of the parent node of a node.
+            Parameters:
+                index : index of the current node
+                keys : set of keys in the data dictionary
+                item : a tuple which contains value and the parent of the current node
+        '''
         start_x = -1
         start_y = -1
 
@@ -92,6 +128,9 @@ class Icicle(BaseChart):
         return height, start_x, start_y
 
     def __draw_fellow_rectangles(self, keys, index):
+        '''
+            draws the rest of the rectangles in the plot other than the root rectangle
+        '''
         for e in self.data:
             if e != keys[0]:
                 item = self.data[e]
@@ -103,7 +142,7 @@ class Icicle(BaseChart):
                 color = self.__calculate_color(item[0])
 
                 # add the rectangle
-                self.__add_rectangle(start_x,start_y,self._width,height,color)
+                self.__add_rectangle(start_x, start_y, self._width, height, color)
 
                 # update the main array with coordinates
                 self.data[keys[index]] = [item[0], item[1], start_x, start_y, self._width, height]
@@ -113,13 +152,16 @@ class Icicle(BaseChart):
                 index += 1
 
     def draw_chart(self):
+        '''
+            draws the root rectangle and calls the functions to draw the other rectangles
+        '''
         self.__convert_data()
         self.__configure_plot()
         keys = list(self.data.keys())
 
         # add rectangle to plot for the first root parent
         color = self.__calculate_color(self.data[keys[0]][0])
-        self.__add_rectangle(0, 0,self._width, self._maxHeight, color)
+        self.__add_rectangle(0, 0, self._width, self._maxHeight, color)
 
         self.ax.text(self._width / 3, self._maxHeight / 2, keys[0], color='white', fontsize=8)
 
@@ -128,4 +170,4 @@ class Icicle(BaseChart):
 
         index = 1
 
-        self.__draw_fellow_rectangles(keys,index)
+        self.__draw_fellow_rectangles(keys, index)
