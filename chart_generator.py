@@ -1,3 +1,4 @@
+from chart.sunburst import Sunburst
 from chart.treemap import Treemap
 from chart.icicle import Icicle
 
@@ -12,6 +13,9 @@ class ChartGenerator:
             case "Treemap":
                 treemap = Treemap(data)
                 figure = treemap.get_figure()
+            case "Sunburst":
+                sunburst = Sunburst(data)
+                figure = sunburst.get_figure()
             case "Icicle":
                 icicle = Icicle(data)
                 figure = icicle.get_figure()

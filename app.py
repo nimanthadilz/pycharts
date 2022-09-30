@@ -1,3 +1,4 @@
+import customtkinter
 import tkinter as tk
 from tkinter import ttk
 from exceptions import ParseError
@@ -31,8 +32,8 @@ class App:
         menu_help.add_command(label="Tutorial", command=self.menu_action, underline=0)
         menu_help.add_command(label="About", command=self.menu_action, underline=0)
 
-        main_frame = ttk.Frame(root, padding="3 3 12 12")
-        main_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        main_frame = customtkinter.CTkFrame(master=root)
+        main_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S), padx=3, pady=12)
 
         self.sidebar = Sidebar(main_frame, self)
         self.output = Output(main_frame)
@@ -59,10 +60,13 @@ class App:
                 self.output.show_chart(figure)
                 file_obj.close()
             except ParseError as e:
+                self.parser.clear_nodes()
                 self.message_handler.show_message(e.message, "Error")
 
 
 if __name__=="__main__":
-    root = tk.Tk()
+    # root = tk.Tk()
+    root = customtkinter.CTk()
+    root.minsize(1480, 720)
     App(root)
     root.mainloop()
