@@ -23,21 +23,21 @@ class DataInputFrame:
         frame_title_label = customtkinter.CTkLabel(master=input_frame, text="Data", text_font=("", 14), anchor="w")
         frame_title_label.grid(row=0, column=0, sticky=(tk.W), padx=(20,0))
 
-        file_label = customtkinter.CTkLabel(master=input_frame, text="File Name").grid(
+        file_label = customtkinter.CTkLabel(master=input_frame, text="File Name", text_font=("", 12)).grid(
             row=1, column=0, sticky=W)
-        file_name_label = customtkinter.CTkLabel(master=input_frame, textvariable=self.file_name)
+        file_name_label = customtkinter.CTkLabel(master=input_frame, textvariable=self.file_name, text_font=("", 12))
         file_name_label.grid(row=1, column=1, sticky=W)
 
-        browse_btn = customtkinter.CTkButton(master=input_frame, text="Select", command=self._file_select)
+        browse_btn = customtkinter.CTkButton(master=input_frame, text="Select", command=self._file_select, text_font=("", 12))
         browse_btn.grid(row=1, column=2, sticky=W)
 
-        chart_type_label = customtkinter.CTkLabel(master=input_frame, text="Chart Type")
+        chart_type_label = customtkinter.CTkLabel(master=input_frame, text="Chart Type", text_font=("", 12))
         chart_type_label.grid(row=2, column=0, sticky=W)
-        chart_type_menu = customtkinter.CTkComboBox(master=input_frame, values=["Treemap", "Icicle", "Sunburst"], variable=self.chart_type)
+        chart_type_menu = customtkinter.CTkComboBox(master=input_frame, values=["Treemap", "Icicle", "Sunburst"], variable=self.chart_type, text_font=("", 12))
         chart_type_menu.configure(state="readonly", text_color="black")
         chart_type_menu.grid(row=2, column=1, sticky=W)
 
-        generate_btn = customtkinter.CTkButton(master=input_frame, text="Generate", command=self._generate_btn_click_handler)
+        generate_btn = customtkinter.CTkButton(master=input_frame, text="Generate", command=self._generate_btn_click_handler, text_font=("", 12))
         generate_btn.grid(row=2, column=2, sticky=W)
 
     def _file_select(self):
