@@ -9,8 +9,8 @@ class DataInputFrame:
         input_frame = customtkinter.CTkFrame(master=root)
         input_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), ipadx=25, padx=25, pady=(25, 0))
         input_frame.columnconfigure(0, weight=1)
-        input_frame.columnconfigure(1, weight=1)
-        input_frame.columnconfigure(2, weight=1)
+        input_frame.columnconfigure(1, weight=2)
+        input_frame.columnconfigure(2, weight=2, pad=20)
         input_frame.rowconfigure(0, pad=20)
         input_frame.rowconfigure(1, pad=20)
         input_frame.rowconfigure(2, pad=20)
@@ -26,19 +26,19 @@ class DataInputFrame:
         file_label = customtkinter.CTkLabel(master=input_frame, text="File Name", text_font=("", 12)).grid(
             row=1, column=0, sticky=W)
         file_name_label = customtkinter.CTkLabel(master=input_frame, textvariable=self.file_name, text_font=("", 12))
-        file_name_label.grid(row=1, column=1, sticky=W)
+        file_name_label.grid(row=1, column=1, sticky=(tk.W, tk.E))
 
         browse_btn = customtkinter.CTkButton(master=input_frame, text="Select", command=self._file_select, text_font=("", 12))
-        browse_btn.grid(row=1, column=2, sticky=W)
+        browse_btn.grid(row=1, column=2)
 
         chart_type_label = customtkinter.CTkLabel(master=input_frame, text="Chart Type", text_font=("", 12))
         chart_type_label.grid(row=2, column=0, sticky=W)
         chart_type_menu = customtkinter.CTkComboBox(master=input_frame, values=["Treemap", "Icicle", "Sunburst"], variable=self.chart_type, text_font=("", 12))
         chart_type_menu.configure(state="readonly", text_color="black")
-        chart_type_menu.grid(row=2, column=1, sticky=W)
+        chart_type_menu.grid(row=2, column=1, sticky=(tk.W, tk.E))
 
         generate_btn = customtkinter.CTkButton(master=input_frame, text="Generate", command=self._generate_btn_click_handler, text_font=("", 12))
-        generate_btn.grid(row=2, column=2, sticky=W)
+        generate_btn.grid(row=2, column=2)
 
     def _file_select(self):
         file_types = (("CSV files", "*.csv"), ("All files", "*.*"))
