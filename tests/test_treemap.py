@@ -19,6 +19,33 @@ class TestTreemap(unittest.TestCase):
     def test_get_figure(self):
         self.assertTrue(isinstance(self.treemap.get_figure(), Figure))
 
+    def test_convert_data(self):
+        expected_data = (
+                            "Documents", 
+                            (
+                                (
+                                    "School",
+                                    (
+                                        ("Assignment",
+                                            100
+                                        ),
+                                    )
+                                ),
+                                (
+                                    "Personal",
+                                    (
+                                        (
+                                            "CV",
+                                            200
+                                        ),
+                                    )
+                                )
+                            )
+        )
+        converted_data = self.treemap._Treemap__convert_data()
+        pp = pprint.PrettyPrinter()
+        pp.pprint(converted_data)
+        self.assertEqual(converted_data, expected_data)
     
 
 if __name__ == "__main__":
