@@ -59,6 +59,7 @@ class App:
                 self.output.show_chart(figure)
                 file_obj.close()
             except ParseError as e:
+                self.parser.clear_nodes()
                 self.message_handler.show_message(e.message, "Error")
 
 
