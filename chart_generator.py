@@ -1,3 +1,4 @@
+from chart.sunburst import Sunburst
 from chart.treemap import Treemap
 
 class ChartGenerator:
@@ -11,4 +12,7 @@ class ChartGenerator:
             case "Treemap":
                 treemap = Treemap(data)
                 figure = treemap.get_figure()
+            case "Sunburst":
+                sunburst = Sunburst(data)
+                figure = sunburst.get_figure()
         return figure
