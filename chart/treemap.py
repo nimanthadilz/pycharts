@@ -1,4 +1,3 @@
-import matplotlib.cm
 from matplotlib.figure import Figure
 import random
 from chart.chart import BaseChart
