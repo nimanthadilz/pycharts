@@ -57,6 +57,8 @@ class TestTreemap(unittest.TestCase):
         return_value = self.treemap._Treemap__calculate_node_value("School", key_list)
         self.assertEqual(return_value, (("Assignment", 100),))
 
+    def test_get_node_name(self):
+        self.assertEqual(self.treemap._Treemap__get_node_name(("Cecil", 20)), "Cecil")
 if __name__ == "__main__":
     unittest.main()
 
