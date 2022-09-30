@@ -67,6 +67,6 @@ class App:
 if __name__=="__main__":
     # root = tk.Tk()
     root = customtkinter.CTk()
-    root.minsize(1280, 720)
+    root.minsize(1480, 720)
     App(root)
     root.mainloop()
