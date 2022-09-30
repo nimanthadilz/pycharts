@@ -36,7 +36,7 @@ class DataInputFrame:
         chart_type_menu.state = "readonly"
 
         generate_btn = customtkinter.CTkButton(master=input_frame, text="Generate", command=self._generate_btn_click_handler)
-        generate_btn.grid(row=2, column=1, sticky=W)
+        generate_btn.grid(row=1, column=2, sticky=W)
 
     def _file_select(self):
         file_types = (("CSV files", "*.csv"), ("All files", "*.*"))
