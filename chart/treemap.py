@@ -4,6 +4,9 @@ from chart.chart import BaseChart
 from utils.utils import get_root_node_key
 
 class Treemap(BaseChart):
+    """
+    A class to represent the Treemap chart type.
+    """
     def __init__(self, data):
         super().__init__(data)
         self.converted_data = self.__convert_data()
@@ -12,9 +15,24 @@ class Treemap(BaseChart):
         self.__draw_treemap(self.converted_data)
 
     def get_figure(self):
+        """
+        Returns a matplotlib.figure.Figure type object.
+        This object can be used to draw the chart in a canvas.
+        """
         return self.figure
 
     def __convert_data(self):
+        """
+        Converts the parsed data into a format which ease the drawing of the chart.
+        Each node is represented by a tuple(name, value). 'value' can be an int or a float or a tuple of node tuples.
+
+        Ex:
+        ('A', (('B', 2), ('C', 3)))
+
+        Returns
+        -------
+        A nested tuple representing data.
+        """
         root_key = get_root_node_key(self.data) 
         keys = list(self.data.keys())
         keys.remove(root_key)
@@ -24,6 +42,18 @@ class Treemap(BaseChart):
         return tuple(converted_data)
 
     def __calculate_node_value(self, node_key: str, key_list: list):
+        """
+        Calculates the value of a given node key.
+
+        Parameters
+        ----------
+        node_key: string
+        key_list: list[string]
+
+        Returns
+        --------
+        a tuple or an int or a flot
+        """
         if self.data[node_key][0] != None:
             return self.data[node_key][0]
         else:
@@ -36,6 +66,17 @@ class Treemap(BaseChart):
             return tuple(child_nodes)
     
     def __calculate_tree(self, root):
+        """
+        Recursively calculate the the sum of the node values under each node and add that value to the tuple format of the representation.
+
+        Parameters
+        ----------
+        root: tuple(name, value)
+
+        Returns
+        -------
+        A nested tuple(name, value, sum)
+        """
         if type(root[1]) == int or type(root[1]) == float:
             return root
         elif type(root[1]) == tuple:
@@ -60,6 +101,13 @@ class Treemap(BaseChart):
             raise ValueError("Invalid node value")
     
     def __pad_rectangles(self, rects, pad=4):
+        """
+        Add padding to a given set of rectangles.
+
+        Parameters
+        ----------
+        rects: list[dict{x, y, dx, dy, name}]
+        """
         for rect in rects:
             rect["x"] += pad
             rect["dx"] -= 2*pad
@@ -68,6 +116,17 @@ class Treemap(BaseChart):
         return rects
 
     def __get_node_name(self, node):
+        """
+        Returns the name string of a given node.
+
+        Parameters
+        ----------
+        node: tuple(name, value)
+
+        Returns
+        -------
+        name: string
+        """
         if type(node) != tuple:
             raise ValueError("Argument node is not a tuple")
 
@@ -75,6 +134,18 @@ class Treemap(BaseChart):
         return node_name
 
     def __get_node_value(self, node):
+        """
+        Returns the value of the given node.
+
+        Parameters
+        ----------
+        node: tuple(name, value)
+            This node parameter must be from the nested tuple returned by self.calculate_tree.
+
+        Returns
+        -------
+        int or float
+        """
         if type(node) != tuple:
             raise ValueError("Argument node is not a tuple")
 
@@ -110,10 +181,22 @@ class Treemap(BaseChart):
         return list(named_sizes)
 
     def __layoutrow(self, named_sizes, x, y, dx, dy):
-        # generate rects for each size in sizes
-        # dx >= dy
-        # they will fill up height dy, and width will be determined by their area
-        # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
+        """
+        Generate rects for each size in named_sizes when dx >= dy. These rects fill up the height.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        list[rects]
+        """
         covered_area = sum(node[1] for node in named_sizes)
         width = covered_area / dy
         rects = []
@@ -124,10 +207,22 @@ class Treemap(BaseChart):
 
 
     def __layoutcol(self, named_sizes, x, y, dx, dy):
-        # generate rects for each size in sizes
-        # dx < dy
-        # they will fill up width dx, and height will be determined by their area
-        # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
+        """
+        Generate rects for each size in named_sizes when dx < dy. These rects fill up the width.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        list[rects]
+        """
         covered_area = sum(node[1] for node in named_sizes)
         height = covered_area / dx
         rects = []
@@ -138,11 +233,43 @@ class Treemap(BaseChart):
 
 
     def __layout(self, named_sizes, x, y, dx, dy):
+        """
+        Use the self.layoutrow and self.layoutcol to generate the rectangles.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        list[rects]
+        """
         return (
             self.__layoutrow(named_sizes, x, y, dx, dy) if dx >= dy else self.__layoutcol(named_sizes, x, y, dx, dy)
         )
 
     def __worst_ratio(self, named_sizes, x, y, dx, dy): 
+        """
+        Calculate the worst ratio from dy/dx and dx/dy for each rect.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        worst_ratio: numeric
+        """
         return max(
             [
                 max(rect["dx"] / rect["dy"], rect["dy"] / rect["dx"])
@@ -151,7 +278,22 @@ class Treemap(BaseChart):
         )
 
     def __leftoverrow(self, named_sizes, x, y, dx, dy):
-        # compute remaining area when dx >= dy
+        """
+        Calculate the remaining area when dx >= dy.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        tuple(leftover_x, leftover_y, leftover_dx, leftover_dy)
+        """
         covered_area = sum(node[1] for node in named_sizes)
         width = covered_area / dy
         leftover_x = x + width
@@ -162,6 +304,22 @@ class Treemap(BaseChart):
 
 
     def __leftovercol(self, named_sizes, x, y, dx, dy):
+        """
+        Calculate the remaining area when dx < dy.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        tuple(leftover_x, leftover_y, leftover_dx, leftover_dy)
+        """
         # compute remaining area when dx >= dy
         covered_area = sum(node[1] for node in named_sizes)
         height = covered_area / dx
@@ -173,6 +331,22 @@ class Treemap(BaseChart):
 
 
     def __leftover(self, named_sizes, x, y, dx, dy):
+        """
+        Use the self.leftoverrow and self.leftovercol to calculate the remaining area.
+
+        Parameters
+        ----------
+        named_sizes: list[(name, size)]
+            The sizes must be normalized wrt to dx, dy.
+        x, y : numeric
+            The coordinates of the "origin".
+        dx, dy : numeric
+            The full width (`dx`) and height (`dy`) of the treemap.
+        
+        Returns
+        -------
+        tuple(leftover_x, leftover_y, leftover_dx, leftover_dy)
+        """
         return (
             self.__leftoverrow(named_sizes, x, y, dx, dy)
             if dx >= dy
@@ -226,6 +400,20 @@ class Treemap(BaseChart):
         )
 
     def __get_rectangles(self, node, x, y, dx=100, dy=100, pad=False):
+        """
+        Calculate the rectangles using the self.squarify method.
+
+        Parameters
+        ----------
+        node: tuple(name, value, sum)
+            This node must be a node returned from self.calculate_tree
+        x, y, dx, dy: numeric
+        pad: boolean
+
+        Returns
+        -------
+        list[rect]
+        """
         node_value = node[1]
 
         if type(node_value) != tuple:
@@ -243,6 +431,18 @@ class Treemap(BaseChart):
         return rectangles
 
     def __plot_rectangles(self, rectangles, colorable=False):
+        """
+        Plots the given rectangles in the matplotlib.figure.Figure object.
+
+        Parameters
+        ----------
+        rectangles: list[rect]
+        colorable: boolean
+
+        Returns
+        -------
+        None
+        """
         ax = self.figure.gca()
 
         x = [rect["x"] for rect in rectangles]
@@ -264,6 +464,17 @@ class Treemap(BaseChart):
         ax.set_ylim(0, 100)
 
     def __draw_treemap(self, root):
+        """
+        Plot the rectangles corresponding to data level by level in the figure object.
+
+        Parameters
+        ----------
+        root: tuple(name, value)
+
+        Returns
+        -------
+        None
+        """
         calculated_tree = self.__calculate_tree(root)
 
         # draw the rectangles of the first level of nodes
