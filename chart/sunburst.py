@@ -12,7 +12,7 @@ from chart.sunburst_path import Path
 from utils.utils import get_root_node_key
 
 STRING_DELIM = "/"
-Angles = collections.namedtuple("Angles", ["theta1", "theta2"])
+Angles = collections.namedtuple("Angles", ["theta1", "theta2"])     
 
 class Sunburst(BaseChart):
     """
@@ -95,7 +95,6 @@ class Sunburst(BaseChart):
     def get_figure(self):
         return self.figure
         
-    # ===============================================================================================
     def __get_parent_key(self, data:dict,  node: str):
         """
         Returns the directory of a node from the root as a string
@@ -164,7 +163,7 @@ class Sunburst(BaseChart):
 
         Returns
         -------
-        dictionary[Str, Float]
+        dict[Str, Float]
         """
         modified_data = {}
         for key, value in data.items():
@@ -193,27 +192,82 @@ class Sunburst(BaseChart):
         }
         
         Parameters
-        data: dictionary of type Path: Value
-        delim: split the items i
+        ----------
+        data: dictionary of type {Path: Value}
+        delim: split the items using "/"
+        
+        Returns
+        -------
+        dict[Path, float]
         """
         assert all(isinstance(item, str) for item in data.keys())
         return {Path(item.split(delim)): value for item, value in data.items()}
-    # ===============================================================================================
     
-    def __complete_pv(self, pathvalues: Dict[Path, float]) -> Dict[Path, float]:
-        if Path(()) in pathvalues:
+    def __complete_pv(self, path_values: Dict[Path, float]):
+        """
+        e.g.
+        data = {
+            Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )): 10, 
+            Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )): 15, 
+            Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )): 22
+        }
+        
+        function returns
+        {
+            Path((, )): 47.0, 
+            Path(('Root', )): 47.0, 
+            Path(('Root', 'Grand Parent1', )): 25.0, 
+            Path(('Root', 'Grand Parent1', 'Parent1', )): 10.0, 
+            Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )): 10.0, 
+            Path(('Root', 'Grand Parent1', 'Parent2', )): 15.0, 
+            Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )): 15.0, 
+            Path(('Root', 'Grand Parent2', )): 22.0, 
+            Path(('Root', 'Grand Parent2', 'Parent3', )): 22.0, 
+            Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )): 22.0
+        }
+        
+        Parameters
+        ----------
+        path_values: dictionary of type {Path: Value}
+        
+        Returns
+        -------
+        Dict[Path, float]
+        """
+        if Path(()) in path_values:
             raise ValueError(
                 "This function does not allow the empty path as item"
                 "in the data list."
             )
         completed: DefaultDict[Path, float] = collections.defaultdict(float)
         
-        for path, value in pathvalues.items():
+        for path, value in path_values.items():
             for level in range(0, len(path) + 1):
                 completed[path[:level]] += value
         return dict(completed)
     
-    def __complete_paths(self, paths: List[Path]) -> List[Path]:
+    def __complete_paths(self, paths: List[Path]):
+        """
+        Preserve the order of path
+        
+        e.g.
+        paths = [
+            Path(('Root', )), Path((, )), Path(('Root', 'Grand Parent1', )), Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )), Path(('Root', 'Grand Parent2', 'Parent3', )), Path(('Root', 'Grand Parent2', )), Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )), Path(('Root', 'Grand Parent1', 'Parent2', )), Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )), Path(('Root', 'Grand Parent1', 'Parent1', ))
+        ]
+        
+        function returns
+        [
+            Path((, )), Path(('Root', )), Path((, )), Path(('Root', 'Grand Parent1', )), Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )), Path(('Root', 'Grand Parent2', 'Parent3', )), Path(('Root', 'Grand Parent2', )), Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )), Path(('Root', 'Grand Parent1', 'Parent2', )), Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )), Path(('Root', 'Grand Parent1', 'Parent1', ))
+        ]
+        
+        Parameters
+        ----------
+        path: list of type Path
+        
+        Returns
+        -------
+        List[Path]
+        """
         ret = [Path(())]
         for path in paths:
             for i in range(1, len(path)):
@@ -223,7 +277,44 @@ class Sunburst(BaseChart):
             ret.append(path)
         return ret
     
-    def __structure_paths(self, paths: List[Path]) -> List[List[List[Path]]]:
+    def __structure_paths(self, paths: List[Path]):
+        """
+        Takes a list of paths and groups the paths first by length (empty path length 0) and then by the parent (path[:len(path) - 1]).
+        e.g.
+        paths = [
+            Path(('Root', )), Path((, )), Path(('Root', 'Grand Parent1', )), Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )), Path(('Root', 'Grand Parent2', 'Parent3', )), Path(('Root', 'Grand Parent2', )), Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )), Path(('Root', 'Grand Parent1', 'Parent2', )), Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )), Path(('Root', 'Grand Parent1', 'Parent1', ))
+        ]
+        
+        function returns
+        [
+            [
+                [Path((, )), Path((, ))]
+            ], 
+            [
+                [Path(('Root', ))]
+            ], 
+            [
+                [Path(('Root', 'Grand Parent1', )), Path(('Root', 'Grand Parent2', ))]
+            ], 
+            [
+                [Path(('Root', 'Grand Parent1', 'Parent2', )), Path(('Root', 'Grand Parent1', 'Parent1', ))], 
+                [Path(('Root', 'Grand Parent2', 'Parent3', ))]
+            ], 
+            [
+                [Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', ))], 
+                [Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', ))], 
+                [Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', ))]
+            ]    
+        ]
+        
+        Parameters
+        ----------
+        paths: List of type Path
+        
+        Returns
+        -------
+        List[List[List[Path]]]
+        """
         structured = []
 
         def level(path):
@@ -247,6 +338,28 @@ class Sunburst(BaseChart):
         return structured
         
     def __calculate_angles(self, structured_paths: List[List[List[Path]]], path_values: Dict[Path, float],) -> Dict[Path, Angles]:
+        """
+        Calculate the Starting angle and ending angle of the wedge
+        e.g.
+            Starting angle of the root is 0
+            Ending angle of the root is 360
+            
+            If root has 2 nodes of the same value, 
+            starting and ending angles of the node 1 is 0 and 180
+            starting and ending angles of the node 2 is 180 and 360
+            
+            and so on
+        
+        Parameters
+        ----------
+        structured_paths: list of paths and groups the paths first by length (empty path length 0) and then by the parent (path[:len(path) - 1]).
+        path_values: Dict[Path, Value] must be in completed_pv
+        
+        Returns
+        -------
+        Dict[Path, Angles]
+            
+        """
         angles: Dict[Path, Angles] = {}
         # the total sum of all elements (on one level)
         value_sum = path_values[Path(())]
@@ -263,9 +376,24 @@ class Sunburst(BaseChart):
                     theta2 = theta1 + 360 * path_values[path] / value_sum
                     angles[path] = Angles(theta1, theta2)
         return angles
-    # ===============================================================================================
     
     def __prepare_data(self):
+        """
+        Sets up variables used for computing  such as, 
+            _completed_pv
+            _completed_path
+            _max_level
+            _structured_paths
+            _angles
+            
+        Parameters
+        ----------
+        This function has no parameters
+        
+        Returns
+        -------
+        None
+        """
         self._completed_pv = self.__complete_pv(self.data)
         ordered_paths: List[Path] = []
         
@@ -293,11 +421,7 @@ class Sunburst(BaseChart):
         elif "keep" in self.order:
             ordered_paths = list(self.data.keys())
             if type(self.data) is dict:
-                print(
-                    "Warning: Looks like you want to keep the order of your"
-                    "input pathvalues, but pathvalues are of type dict "
-                    "which does keep record of the order of its items."
-                )
+                print("Warning: path values are of type dict. can not keep the order of path values")
         elif "value" in self.order:
             ordered_paths = sorted(
                 self._completed_pv.keys(),
@@ -322,7 +446,19 @@ class Sunburst(BaseChart):
                 if len(path) == 0 or angle > self.plot_minimal_angle:
                     self.wedges[path] = self.__wedge(path)
 
-    def __is_outmost(self, path: Path) -> bool:
+    def __is_outmost(self, path: Path):
+        """
+        Checks whether thewedge corresponding to the path is the outmost wedge
+        return True if there is no descendant of the path
+        
+        Parameters
+        ----------
+        path: Path of a node
+        
+        Returns
+        -------
+        bool
+        """
         level = len(path)
         if level == self._max_level:
             return True
@@ -333,38 +469,128 @@ class Sunburst(BaseChart):
                 continue
         return True
     
-    def __wedge_width(self, path: Path)-> float:
+    def __wedge_width(self):
+        """
+        The width of the wedge corresponding to `path`
+        sets to 0.75
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        float
+        """
         return self.base_wedge_width
     
-    def __wedge_spacing(self, path: Path) -> Tuple[float, float]:
+    def __wedge_spacing(self):
+        """
+        The radial space before and after the wedge
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        Tuple[float, float]
+        """
         return 0, 0
 
-    def _wedge_outer_radius(self, path: Path) -> float:
-        return self._wedge_inner_radius(path) + self.__wedge_width(path)
-    
-    def _wedge_inner_radius(self, path: Path) -> float:
+    def _wedge_inner_radius(self, path: Path):
+        """
+        The inner radius of the wedge corresponding to the path
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        float
+        """
         start = 0 if self.plot_center else 1
         ancestors = [path[:i] for i in range(start, len(path))]
         return (
             sum(
-                self.__wedge_width(ancestor) + sum(self.__wedge_spacing(ancestor))
+                self.__wedge_width() + sum(self.__wedge_spacing())
                 for ancestor in ancestors
             )
-            + self.__wedge_spacing(path)[0]
+            + self.__wedge_spacing()[0]
         )
+    
+    def _wedge_outer_radius(self, path: Path):
+        """
+        The outer radius of the wedge corresponding to the path
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        float
+        """
+        return self._wedge_inner_radius(path) + self.__wedge_width()
         
     def __wedge_mid_radius(self, path: Path) -> float:
+        """
+        The radius of the middle of the wedge corresponding to a path.
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        float
+        """
         return (
             self._wedge_outer_radius(path) + self._wedge_inner_radius(path)
         ) / 2
         
-    def __edge_color(self, path: Path) -> Tuple[float, float, float, float]:
+    def __edge_color(self):
+        """
+        The line color of the wedge
+        sets to (0,0,0,1)
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        Tuple[float, float, float, float]
+        """
         return self.base_edge_color
     
-    def __line_width(self, path: Path) -> float:
+    def __line_width(self):
+        """
+        The line width of the wedge
+        sets to 0.75
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        float
+        """
         return self.base_line_width;
     
-    def __face_color(self, path: Path) -> Tuple[float, float, float, float]:
+    def __face_color(self, path: Path):
+        """
+        The color of the wedge corresponding to the path
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        Tuple[float, float, float, float]
+        """
         if len(path) == 0:
             color: List[float] = [1, 1, 1, 1]
         else:
@@ -376,26 +602,85 @@ class Sunburst(BaseChart):
                 )
         return tuple(color)
     
-    def __alpha(self, path: Path) -> float:
+    def __alpha(self):
         return 1
     
-    def __textbox_props(self, path: Path, text_type: str) -> Dict:
+    def __textbox_props(self):
+        """
+        Properties of the textbox (bbox) that annotating the wedge corresponding to `path`
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        dictionary of keyword properties for the bbox option 
+        """
         return self.base_textbox_props
     
-    def __format_path_text(self, path) -> str:
+    def __format_path_text(self, path):
+        """
+        Returns a string which represent the path of the corresponding wedge
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        str
+        """
         return path[-1] if path else ""
     
-    def __format_value_text(self, value: float) -> str:
+    def __format_value_text(self, value: float):
+        """
+        Returns a string which represent the value of the corresponding wedge
+        
+        Parameters
+        ----------
+        value: float
+        
+        Returns
+        -------
+        str
+        """
         return "{0:.2f}".format(value)
     
-    def __format_text(self, path: Path) -> str:
+    def __format_text(self, path: Path):
+        """
+        Returns a string which represent the corresponding wedge
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        str
+        """
         path_text = self.__format_path_text(path)
         value_text = self.__format_value_text(self._completed_pv[path])
         if path_text and value_text:
             return "{} ({})".format(path_text, value_text)
         return path_text
     
-    def __radial_text(self, path: Path) -> None:
+    def __radial_text(self, path: Path):
+        """
+        Adds a radially rotated annotation for the wedge corresponding to `path` to the axes
+        
+        e.g.
+        if the angle is between 0 and 90 do not rotate text angle
+        if the angle is between 90 and 270 rotate text by 180
+        if the angle is between 270 and 360, flip the text
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        None
+        """
         theta1, theta2 = self._angles[path].theta1, self._angles[path].theta2
         angle = (theta1 + theta2) / 2
         radius = self.__wedge_mid_radius(path)
@@ -414,6 +699,7 @@ class Sunburst(BaseChart):
         else:
             raise ValueError
 
+        # to avoid the clashes with below levels, move the text further out
         if self.__is_outmost(path):
             if 0 <= angle < 90:
                 va = "bottom"
@@ -441,25 +727,37 @@ class Sunburst(BaseChart):
             ha=ha,
             va=va,
             rotation=rotation,
-            bbox=self.__textbox_props(path, "radial"),
+            bbox=self.__textbox_props(),
         )
     
-    def __tangential_text(self, path: Path) -> None:
+    def __tangential_text(self, path: Path):
+        """
+        Adds a tangentially rotated annotation for the wedge corresponding to `path` to the axes
+        
+        e.g.
+        if the angle is between 0 and 180 rotate by 90
+        if the angle is 180, rotate by 180 
+        if the angle is between 180 and 360, rotate by 270
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        None
+        """
         theta1, theta2 = self._angles[path].theta1, self._angles[path].theta2
         angle = (theta1 + theta2) / 2
         radius = self.__wedge_mid_radius(path)
         mid_x = self.origin[0] + radius * np.cos(np.deg2rad(angle))
         mid_y = self.origin[1] + radius * np.sin(np.deg2rad(angle))
 
-        if 0 <= angle < 90:
-            rotation = angle - 90
-        elif 90 <= angle < 180:
+        if 0 <= angle < 180:
             rotation = angle - 90
         elif angle == 180:
             rotation = angle - 180
-        elif 180 < angle < 270:
-            rotation = angle - 270
-        elif 270 <= angle < 360:
+        elif 180 < angle < 360:
             rotation = angle - 270
         else:
             raise ValueError
@@ -472,21 +770,45 @@ class Sunburst(BaseChart):
             ha="center",
             va="center",
             rotation=rotation,
-            bbox=self.__textbox_props(path, "tangential"),
+            bbox=self.__textbox_props(),
         )
     
     def __add_annotation(self, path):
+        """
+        Add the radial or tangential text to the wedge
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        None
+        """
         angle = self._angles[path].theta2 - self._angles[path].theta1
 
         if not angle > self.label_minimal_angle:
-            return
+            return  # no text
 
         if len(path) * angle > 90:
             self.__tangential_text(path)
         else:
             self.__radial_text(path)
             
-    def __plot(self, setup_axes=False, interactive=False)-> None:    
+    def __plot(self, setup_axes=False, interactive=False)-> None:
+        """
+        Combines all the necesesary preperations and add the plot to the axes
+        
+        Parameters
+        ----------
+        
+        set_up_axes: bool, Basic setup for the axes
+        interactive: bool, Display label for the wedge under the cursor only.
+        
+        Returns
+        -------
+        None
+        """    
         self.axes.set_title("Title")
         
         if not self.wedges:
@@ -522,16 +844,27 @@ class Sunburst(BaseChart):
             self.axes.figure.canvas.mpl_connect("motion_notify_event", hover)
     
     def __wedge(self, path: Path) -> Wedge:
+        """
+        Generates the wedges corresponding to the path
+        
+        Parameters
+        ----------
+        path: Path
+        
+        Returns
+        -------
+        Wedge
+        """
         return Wedge(
             (self.origin[0], self.origin[1]),
             self._wedge_outer_radius(path),
             self._angles[path].theta1,
             self._angles[path].theta2,
-            width=self.__wedge_width(path),
+            width=self.__wedge_width(),
             label=self.__format_text(path),
             facecolor=self.__face_color(path),
-            edgecolor=self.__edge_color(path),
-            linewidth=self.__line_width(path),
+            edgecolor=self.__edge_color(),
+            linewidth=self.__line_width(),
             fill=True,
-            alpha=self.__alpha(path),
+            alpha=self.__alpha(),
         )
