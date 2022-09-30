@@ -1,6 +1,7 @@
 import customtkinter
 import tkinter as tk
 from tkinter import W, ttk
+from ui.customization_frame import CustomizationFrame
 from ui.data_input_frame import DataInputFrame
 
 
@@ -9,14 +10,14 @@ class Sidebar:
         # styles = ttk.Style()
         # styles.configure('Danger.TFrame', borderwidth=5, relief="raised")
 
-        sidebarFrame = customtkinter.CTkFrame(master=root)
-        sidebarFrame["borderwidth"] = 2 
-        sidebarFrame.grid(row=0, column=1, sticky=(tk.N, tk.W, tk.E, tk.S))
-        sidebarFrame.rowconfigure(1, weight=1)
-        sidebarFrame.columnconfigure(0, weight=1)
+        sidebar_frame = customtkinter.CTkFrame(master=root)
+        sidebar_frame.grid(row=0, column=1, sticky=(tk.N, tk.S, tk.W, tk.E), ipadx=25)
+        sidebar_frame.rowconfigure(1)
+        sidebar_frame.rowconfigure(2)
+        sidebar_frame.columnconfigure(0, weight=1)
 
-        nameLabel = customtkinter.CTkLabel(master=sidebarFrame, text="Sidebar")
-        nameLabel.grid(row=0, column=0, sticky=W)
-        DataInputFrame(sidebarFrame, app)
-
+        nameLabel = customtkinter.CTkLabel(master=sidebar_frame, text="Sidebar", text_font=("", 16))
+        nameLabel.grid(row=0, column=0, sticky=W, pady=(15, 0))
+        DataInputFrame(sidebar_frame, app)
+        CustomizationFrame(sidebar_frame, app)
 

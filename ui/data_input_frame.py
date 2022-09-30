@@ -7,7 +7,7 @@ import os
 class DataInputFrame:
     def __init__(self, root, app):
         input_frame = customtkinter.CTkFrame(master=root)
-        input_frame.grid(row=1, column=0, sticky=(tk.N, tk.W, tk.E, tk.S), ipadx=50, ipady=50)
+        input_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), ipadx=25, padx=25, pady=(25, 0))
         input_frame.columnconfigure(0, weight=1)
         input_frame.columnconfigure(1, weight=1)
         input_frame.columnconfigure(2, weight=1)
@@ -20,23 +20,25 @@ class DataInputFrame:
         self.chart_type = tk.StringVar(input_frame, "Treemap")
         self.file_obj = None
 
+        frame_title_label = customtkinter.CTkLabel(master=input_frame, text="Data", text_font=("", 14), anchor="w")
+        frame_title_label.grid(row=0, column=0, sticky=(tk.W), padx=(20,0))
 
         file_label = customtkinter.CTkLabel(master=input_frame, text="File Name").grid(
-            row=0, column=0, sticky=W)
+            row=1, column=0, sticky=W)
         file_name_label = customtkinter.CTkLabel(master=input_frame, textvariable=self.file_name)
-        file_name_label.grid(row=0, column=1, sticky=W)
+        file_name_label.grid(row=1, column=1, sticky=W)
 
         browse_btn = customtkinter.CTkButton(master=input_frame, text="Select", command=self._file_select)
-        browse_btn.grid(row=0, column=2, sticky=W)
+        browse_btn.grid(row=1, column=2, sticky=W)
 
         chart_type_label = customtkinter.CTkLabel(master=input_frame, text="Chart Type")
-        chart_type_label.grid(row=1, column=0, sticky=W)
+        chart_type_label.grid(row=2, column=0, sticky=W)
         chart_type_menu = customtkinter.CTkComboBox(master=input_frame, values=["Treemap", "Icicle", "Sunburst"], variable=self.chart_type)
-        chart_type_menu.grid(row=1, column=1, sticky=W)
-        chart_type_menu.state = "readonly"
+        chart_type_menu.configure(state="readonly", text_color="black")
+        chart_type_menu.grid(row=2, column=1, sticky=W)
 
         generate_btn = customtkinter.CTkButton(master=input_frame, text="Generate", command=self._generate_btn_click_handler)
-        generate_btn.grid(row=1, column=2, sticky=W)
+        generate_btn.grid(row=2, column=2, sticky=W)
 
     def _file_select(self):
         file_types = (("CSV files", "*.csv"), ("All files", "*.*"))
