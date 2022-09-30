@@ -455,7 +455,9 @@ class Sunburst(BaseChart):
             rotation = angle - 90
         elif 90 <= angle < 180:
             rotation = angle - 90
-        elif 180 <= angle < 270:
+        elif angle == 180:
+            rotation = angle - 180
+        elif 180 < angle < 270:
             rotation = angle - 270
         elif 270 <= angle < 360:
             rotation = angle - 270
