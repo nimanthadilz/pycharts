@@ -1,6 +1,27 @@
 from typing import Dict, Iterable
 
 class Path(tuple):
+    """
+    The class to represent the directory of a node in a hierarchical type
+    
+    e.g.
+        data = {
+            "Root" : (None, None),
+            "Grand Parent1" : (None, "Root"),
+            "Parent1" : (None, "Grand Parent1"),
+            "Child1" : (10, "Parent1"),
+            "Parent2" : (None, "Grand Parent1"),
+            "Child2" : (15, "Parent2"),
+            "Grand Parent2" : (None, "Root"),
+            "Parent3" : (None, "Grand Parent2"),
+            "Child3" : (22, "Parent3"),
+        }
+        
+    path of "Root" is None because it is the root node
+    path of "Grand Parent1" is 'Root'
+    path of Parent1 is 'Root/Grand Parent1'
+    path of ParentChild11 is 'Root/Grand Parent1/Parent1'
+    """
     def __new__(cls, __iterable: Iterable[str]):
         for item in __iterable:
             assert isinstance(item, str)

@@ -497,7 +497,7 @@ class Sunburst(BaseChart):
         """
         return 0, 0
 
-    def _wedge_inner_radius(self, path: Path):
+    def __wedge_inner_radius(self, path: Path):
         """
         The inner radius of the wedge corresponding to the path
         
@@ -519,7 +519,7 @@ class Sunburst(BaseChart):
             + self.__wedge_spacing()[0]
         )
     
-    def _wedge_outer_radius(self, path: Path):
+    def __wedge_outer_radius(self, path: Path):
         """
         The outer radius of the wedge corresponding to the path
         
@@ -531,7 +531,7 @@ class Sunburst(BaseChart):
         -------
         float
         """
-        return self._wedge_inner_radius(path) + self.__wedge_width()
+        return self.__wedge_inner_radius(path) + self.__wedge_width()
         
     def __wedge_mid_radius(self, path: Path) -> float:
         """
@@ -546,7 +546,7 @@ class Sunburst(BaseChart):
         float
         """
         return (
-            self._wedge_outer_radius(path) + self._wedge_inner_radius(path)
+            self.__wedge_outer_radius(path) + self.__wedge_inner_radius(path)
         ) / 2
         
     def __edge_color(self):
@@ -685,7 +685,7 @@ class Sunburst(BaseChart):
         angle = (theta1 + theta2) / 2
         radius = self.__wedge_mid_radius(path)
         if self.__is_outmost(path):
-            radius = self._wedge_inner_radius(path)
+            radius = self.__wedge_inner_radius(path)
 
         mid_x = self.origin[0] + radius * np.cos(np.deg2rad(angle))
         mid_y = self.origin[1] + radius * np.sin(np.deg2rad(angle))
@@ -857,7 +857,7 @@ class Sunburst(BaseChart):
         """
         return Wedge(
             (self.origin[0], self.origin[1]),
-            self._wedge_outer_radius(path),
+            self.__wedge_outer_radius(path),
             self._angles[path].theta1,
             self._angles[path].theta2,
             width=self.__wedge_width(),
