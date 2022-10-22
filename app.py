@@ -15,7 +15,8 @@ class App:
         self.message_handler = MessageHandler(root)
 
         root.title("PyCharts++")
-        root.state("zoomed")
+        # below line throws an exception in linux 
+        # root.state("zoomed")
         root.option_add("*tearOff", tk.FALSE)
 
         # Menubar
