@@ -7,12 +7,20 @@ class Treemap(BaseChart):
     """
     A class to represent the Treemap chart type.
     """
-    def __init__(self, data):
+    def __init__(self, data, chart_properties = {}):
         super().__init__(data)
         self.converted_data = self.__convert_data()
         self.figure = Figure((8, 6), 100)
+        self.chart_properties = chart_properties
         self.figure.gca().set_axis_off()
         self.__draw_treemap(self.converted_data)
+        self.__customize_chart()
+
+    def __customize_chart(self):
+        if self.chart_properties:
+            if self.chart_properties["title"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=20)
+
 
     def get_figure(self):
         """

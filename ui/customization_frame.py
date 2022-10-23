@@ -25,7 +25,7 @@ class CustomizationFrame:
         # Title
         title_label = customtkinter.CTkLabel(master=customization_frame, text="Title", text_font=("", 12)).grid(
             row=1, column=0, sticky=tk.W)
-        title_entry = customtkinter.CTkEntry(master=customization_frame, placeholder_text="Enter title", text_font=("", 12))
+        title_entry = customtkinter.CTkEntry(master=customization_frame, placeholder_text="Enter title", text_font=("", 12), textvariable=self.title)
         title_entry.grid(row=1, column=1, sticky=(tk.W, tk.E))
 
         # Title font
@@ -55,10 +55,16 @@ class CustomizationFrame:
         color_select_btn.grid(row=4, column=2)
 
         # update button
-        update_btn = customtkinter.CTkButton(master=customization_frame, text="Update", text_font=("", 12))
+        update_btn = customtkinter.CTkButton(master=customization_frame, text="Update", text_font=("", 12), command=self.update_chart)
         update_btn.grid(row=5, column=0)
 
         # reset button
         reset_btn = customtkinter.CTkButton(master=customization_frame, text="Reset", text_font=("", 12))
         reset_btn.grid(row=5, column=1, sticky=(tk.W))
+
+    def update_chart(self):
+        chart_properties = {
+            "title": self.title.get()
+        }
+        self.app.update_chart(chart_properties)
 

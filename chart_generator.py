@@ -7,11 +7,11 @@ class ChartGenerator:
         self.chart_type = None
         self.file_obj = None
 
-    def generate_chart(self, chart_type, data):
+    def generate_chart(self, chart_type, data, chart_properties = {}):
         figure = None
         match chart_type:
             case "Treemap":
-                treemap = Treemap(data)
+                treemap = Treemap(data, chart_properties)
                 figure = treemap.get_figure()
             case "Sunburst":
                 sunburst = Sunburst(data)
