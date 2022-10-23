@@ -16,8 +16,12 @@ class CustomizationFrame:
         customization_frame.rowconfigure(4, pad=20)
         customization_frame.rowconfigure(5, pad=20)
 
+        self.root = root
         self.app = app
         self.title = tk.StringVar(customization_frame, "")
+        self.title_font_string = tk.StringVar(customization_frame, "Arial 20")
+        self.title_font_family = "Arial"
+        self.title_font_size = 20
 
         frame_title_label = customtkinter.CTkLabel(master=customization_frame, text="Customization", text_font=("", 14), anchor="w")
         frame_title_label.grid(row=0, column=0, sticky=(tk.W), padx=(20,0))
@@ -31,9 +35,9 @@ class CustomizationFrame:
         # Title font
         title_font_label = customtkinter.CTkLabel(master=customization_frame, text="Title font", text_font=("", 12)).grid(
             row=2, column=0, sticky=tk.W)
-        title_font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled")
+        title_font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled", textvariable=self.title_font_string)
         title_font_entry.grid(row=2, column=1, sticky=(tk.W, tk.E))
-        title_font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12))
+        title_font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12), command=self.__show_font_selector)
         title_font_select_btn.grid(row=2, column=2)
 
 
@@ -64,7 +68,32 @@ class CustomizationFrame:
 
     def update_chart(self):
         chart_properties = {
-            "title": self.title.get()
+            "title": self.title.get(),
+            "title_font_family": self.title_font_family,
+            "title_font_size": self.title_font_size
         }
         self.app.update_chart(chart_properties)
+
+    def __title_font_changed(self, font):
+        font_properties = []
+        if font[0] != "{":
+            font_properties = font.split(" ")
+        else:
+            i = 1
+            token = ""
+            while font[i] != "}":
+                token += font[i]
+                i += 1
+            font_properties.append(token)
+            font_properties.extend(font[i + 1:].strip().split(" "))
+
+        self.title_font_family = font_properties[0]
+        self.title_font_size = int(font_properties[1])
+        self.title_font_string.set(" ".join(font_properties))
+
+    def __show_font_selector(self):
+        self.root.tk.call("tk", "fontchooser", "configure", "-font", f"{{{self.title_font_family}}} {self.title_font_size}", "-command", self.root.register(self.__title_font_changed))
+        self.root.tk.call("tk", "fontchooser", "show")
+        
+        
 

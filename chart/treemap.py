@@ -20,6 +20,8 @@ class Treemap(BaseChart):
         if self.chart_properties:
             if self.chart_properties["title"]:
                 self.figure.suptitle(self.chart_properties["title"], fontsize=20)
+            if self.chart_properties["title"] and self.chart_properties["title_font_family"] and self.chart_properties["title_font_size"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"], fontfamily=self.chart_properties["title_font_family"])
 
 
     def get_figure(self):
