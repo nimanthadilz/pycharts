@@ -19,9 +19,14 @@ class CustomizationFrame:
         self.root = root
         self.app = app
         self.title = tk.StringVar(customization_frame, "")
+
         self.title_font_string = tk.StringVar(customization_frame, "Arial 20")
         self.title_font_family = "Arial"
         self.title_font_size = 20
+
+        self.chart_font_string = tk.StringVar(customization_frame, "Arial 8")
+        self.chart_font_family = "Arial"
+        self.chart_font_size = 8
 
         frame_title_label = customtkinter.CTkLabel(master=customization_frame, text="Customization", text_font=("", 14), anchor="w")
         frame_title_label.grid(row=0, column=0, sticky=(tk.W), padx=(20,0))
@@ -41,12 +46,12 @@ class CustomizationFrame:
         title_font_select_btn.grid(row=2, column=2)
 
 
-        # Font
+        # Chart Font
         font_label = customtkinter.CTkLabel(master=customization_frame, text="Font", text_font=("", 12)).grid(
             row=3, column=0, sticky=tk.W)
-        font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled")
+        font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled", textvariable=self.chart_font_string)
         font_entry.grid(row=3, column=1, sticky=(tk.W, tk.E))
-        font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12))
+        font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12), command=self.__show_chart_font_selector)
         font_select_btn.grid(row=3, column=2)
 
 
@@ -70,7 +75,9 @@ class CustomizationFrame:
         chart_properties = {
             "title": self.title.get(),
             "title_font_family": self.title_font_family,
-            "title_font_size": self.title_font_size
+            "title_font_size": self.title_font_size,
+            "chart_font_family": self.chart_font_family,
+            "chart_font_size": self.chart_font_size
         }
         self.app.update_chart(chart_properties)
 
@@ -95,5 +102,25 @@ class CustomizationFrame:
         self.root.tk.call("tk", "fontchooser", "configure", "-font", f"{{{self.title_font_family}}} {self.title_font_size}", "-command", self.root.register(self.__title_font_changed))
         self.root.tk.call("tk", "fontchooser", "show")
         
+    def __chart_font_changed(self, font):
+        font_properties = []
+        if font[0] != "{":
+            font_properties = font.split(" ")
+        else:
+            i = 1
+            token = ""
+            while font[i] != "}":
+                token += font[i]
+                i += 1
+            font_properties.append(token)
+            font_properties.extend(font[i + 1:].strip().split(" "))
+
+        self.chart_font_family = font_properties[0]
+        self.chart_font_size = int(font_properties[1])
+        self.chart_font_string.set(" ".join(font_properties))
+
+    def __show_chart_font_selector(self):
+        self.root.tk.call("tk", "fontchooser", "configure", "-font", f"{{{self.chart_font_family}}} {self.chart_font_size}", "-command", self.root.register(self.__chart_font_changed))
+        self.root.tk.call("tk", "fontchooser", "show")
         
 
