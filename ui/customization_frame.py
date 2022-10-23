@@ -37,7 +37,7 @@ class CustomizationFrame:
             row=2, column=0, sticky=tk.W)
         title_font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled", textvariable=self.title_font_string)
         title_font_entry.grid(row=2, column=1, sticky=(tk.W, tk.E))
-        title_font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12), command=self.__show_font_selector)
+        title_font_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12), command=self.__show_title_font_selector)
         title_font_select_btn.grid(row=2, column=2)
 
 
@@ -91,7 +91,7 @@ class CustomizationFrame:
         self.title_font_size = int(font_properties[1])
         self.title_font_string.set(" ".join(font_properties))
 
-    def __show_font_selector(self):
+    def __show_title_font_selector(self):
         self.root.tk.call("tk", "fontchooser", "configure", "-font", f"{{{self.title_font_family}}} {self.title_font_size}", "-command", self.root.register(self.__title_font_changed))
         self.root.tk.call("tk", "fontchooser", "show")
         
