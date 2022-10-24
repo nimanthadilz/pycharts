@@ -7,12 +7,29 @@ class Treemap(BaseChart):
     """
     A class to represent the Treemap chart type.
     """
-    def __init__(self, data):
+    def __init__(self, data, chart_properties = {}):
         super().__init__(data)
         self.converted_data = self.__convert_data()
         self.figure = Figure((8, 6), 100)
+        if chart_properties:
+            self.chart_properties = chart_properties
+        else:
+            self.chart_properties = {
+                "title": "",
+                "chart_font_family": "Arial",
+                "chart_font_size": 8
+            }
         self.figure.gca().set_axis_off()
         self.__draw_treemap(self.converted_data)
+        self.__customize_chart()
+
+    def __customize_chart(self):
+        if self.chart_properties:
+            if "title" in self.chart_properties and self.chart_properties["title"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=20)
+            if self.chart_properties["title"] and self.chart_properties["title_font_family"] and self.chart_properties["title_font_size"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"], fontfamily=self.chart_properties["title_font_family"])
+
 
     def get_figure(self):
         """
@@ -458,7 +475,11 @@ class Treemap(BaseChart):
             ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
         
         for i in range(len(rectangles)):
-            ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i])
+            font = {
+                "family": self.chart_properties["chart_font_family"],
+                "size": self.chart_properties["chart_font_size"]
+            }
+            ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i], fontdict=font)
         
         ax.set_xlim(0, 100)
         ax.set_ylim(0, 100)

@@ -13,9 +13,11 @@ class App:
         self.parser = Parser()
         self.chart_generator = ChartGenerator()
         self.message_handler = MessageHandler(root)
+        self.data = None
 
         root.title("PyCharts++")
-        root.state("zoomed")
+        # below line throws an exception in linux 
+        # root.state("zoomed")
         root.option_add("*tearOff", tk.FALSE)
 
         # Menubar
@@ -54,14 +56,25 @@ class App:
             self.message_handler.show_message("File is closed. Please reselect the file.", "Error")
         else:
             try:
-                data = self.parser.parse(file_obj)
+                self.data = { "chart_type": chart_type.get(), "nodes": self.parser.parse(file_obj) }
                 self.parser.clear_nodes()
-                figure = self.chart_generator.generate_chart(chart_type.get(), data)
+                figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"])
                 self.output.show_chart(figure)
                 file_obj.close()
             except ParseError as e:
                 self.parser.clear_nodes()
                 self.message_handler.show_message(e.message, "Error")
+
+    def update_chart(self, chart_properties: dict):
+        if self.data == None:
+            self.message_handler.show_message("No data has been read.", "Error")
+            return
+
+        figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"], chart_properties)
+        self.output.show_chart(figure)
+        
+
+
 
 
 if __name__=="__main__":
