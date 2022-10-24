@@ -6,10 +6,29 @@ import sys
 
 class Icicle(BaseChart):
 
-    def __init__(self, data):
+    def __init__(self, data, chart_properties = {}):
         super().__init__(data)
         self.__configure_chart()
         self.draw_chart()
+
+        if chart_properties:
+            self.chart_properties = chart_properties
+        else:
+            self.chart_properties = {
+                "title": "",
+                "chart_font_family": "Arial",
+                "chart_font_size": 8
+            }
+
+        self.__customize_chart()
+
+    def __customize_chart(self):
+        if self.chart_properties:
+            if "title" in self.chart_properties and self.chart_properties["title"]:
+                plt.title(self.chart_properties["title"])
+            if self.chart_properties["title"] and self.chart_properties["title_font_family"] and self.chart_properties["title_font_size"]:
+                plt.title(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"], fontfamily=self.chart_properties["title_font_family"])
+
 
     def __configure_chart(self, left_color="#8B008B", right_color="#FF00FF", element_width=1.5,
                           chart_height=20):
