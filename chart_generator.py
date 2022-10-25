@@ -17,6 +17,6 @@ class ChartGenerator:
                 sunburst = Sunburst(data, chart_properties)
                 figure = sunburst.get_figure()
             case "Icicle":
-                icicle = Icicle(data)
+                icicle = Icicle(data, chart_properties)
                 figure = icicle.get_figure()
         return figure
