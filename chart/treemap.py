@@ -1,3 +1,5 @@
+import copy
+import matplotlib as mpl
 from matplotlib.figure import Figure
 import random
 from chart.chart import BaseChart
@@ -447,42 +449,76 @@ class Treemap(BaseChart):
             return self.__pad_rectangles(rectangles, dx, dy)
         return rectangles
 
-    def __plot_rectangles(self, rectangles, colorable=False):
-        """
-        Plots the given rectangles in the matplotlib.figure.Figure object.
+    # def __plot_rectangles(self, rectangles, level, colorable=False):
+    #     """
+    #     Plots the given rectangles in the matplotlib.figure.Figure object.
 
-        Parameters
-        ----------
-        rectangles: list[rect]
-        colorable: boolean
+    #     Parameters
+    #     ----------
+    #     rectangles: list[rect]
+    #     colorable: boolean
 
-        Returns
-        -------
-        None
-        """
-        ax = self.figure.gca()
+    #     Returns
+    #     -------
+    #     None
+    #     """
+    #     ax = self.figure.gca()
 
-        x = [rect["x"] for rect in rectangles]
-        y = [rect["y"] for rect in rectangles]
-        dx = [rect["dx"] for rect in rectangles]
-        dy = [rect["dy"] for rect in rectangles]
-        names = [rect["name"] for rect in rectangles]
+    #     x = [rect["x"] for rect in rectangles]
+    #     y = [rect["y"] for rect in rectangles]
+    #     dx = [rect["dx"] for rect in rectangles]
+    #     dy = [rect["dy"] for rect in rectangles]
+    #     names = [rect["name"] for rect in rectangles]
 
-        if colorable:
-            color = (random.random(), random.random(), random.random())
-            ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=color, align="edge")
-        else:
-            ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
+    #     if colorable:
+    #         # color = (random.random(), random.random(), random.random())
+    #         colormap = mpl.colormaps['Blues_r']
+    #         color_value = random.random()
+    #         # ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=color, align="edge")
+    #         ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=colormap(color_value) , align="edge")
+    #     else:
+    #         ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
         
-        for i in range(len(rectangles)):
-            font = {
-                "family": self.chart_properties["chart_font_family"],
-                "size": self.chart_properties["chart_font_size"]
-            }
-            ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i], fontdict=font)
+    #     for i in range(len(rectangles)):
+    #         font = {
+    #             "family": self.chart_properties["chart_font_family"],
+    #             "size": self.chart_properties["chart_font_size"]
+    #         }
+    #         ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i], fontdict=font)
         
-        ax.set_xlim(0, 100)
-        ax.set_ylim(0, 100)
+    #     ax.set_xlim(0, 100)
+    #     ax.set_ylim(0, 100)
+    
+    def __plot_rectangles(self, rectangles_by_level, colorable=True):
+        level_count = len(rectangles_by_level)
+
+        for index in range(level_count):
+            level_rects = rectangles_by_level[index]
+
+            ax = self.figure.gca()
+            x = [rect["x"] for rect in level_rects]
+            y = [rect["y"] for rect in level_rects]
+            dx = [rect["dx"] for rect in level_rects]
+            dy = [rect["dy"] for rect in level_rects]
+            names = [rect["name"] for rect in level_rects]
+
+            if colorable:
+                colormap = mpl.colormaps[self.chart_properties["colormap"]]
+                color_value = (index + 1) / level_count
+                color = colormap(color_value)
+                ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=color, align="edge")
+            else:
+                ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
+            
+            for i in range(len(level_rects)):
+                font = {
+                    "family": self.chart_properties["chart_font_family"],
+                    "size": self.chart_properties["chart_font_size"]
+                }
+                ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i], fontdict=font)
+            
+            ax.set_xlim(0, 100)
+            ax.set_ylim(0, 100)
 
     def __draw_treemap(self, root):
         """
@@ -498,9 +534,11 @@ class Treemap(BaseChart):
         """
         calculated_tree = self.__calculate_tree(root)
 
+        all_rectangles = []
         # draw the rectangles of the first level of nodes
         level_rects = self.__get_rectangles(calculated_tree, 0, 0)
-        self.__plot_rectangles(level_rects, True)
+        all_rectangles.append(copy.deepcopy(level_rects))
+        # self.__plot_rectangles(level_rects, 10000, colorable=True)
         # pad the drawn rectangles
         level_rects = self.__pad_rectangles(level_rects)
 
@@ -509,18 +547,22 @@ class Treemap(BaseChart):
             for i in range(len(calculated_tree[1])):
                 queue.append((calculated_tree[1][i], level_rects[i]))
 
+
             while len(queue) > 0:
                 node, rect = queue.pop(0)
 
                 # Draw the inner rectangles of the node
                 node_rects = self.__get_rectangles(node, rect["x"], rect["y"], rect["dx"], rect["dy"])
-                self.__plot_rectangles(node_rects, True)
+                # self.__plot_rectangles(node_rects, rect["dx"]*rect["dy"], colorable=True)
+                all_rectangles.append(copy.deepcopy(node_rects))
                 node_rects = self.__pad_rectangles(node_rects)
 
                 # Add children nodes to the queue
                 if (type(node[1]) == tuple and len(node[1])):
                     for i in range(len(node[1])):
                         queue.append((node[1][i], node_rects[i]))
+
+            self.__plot_rectangles(all_rectangles, colorable=True)
 
 
 
