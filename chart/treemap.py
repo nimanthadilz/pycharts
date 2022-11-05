@@ -502,7 +502,7 @@ class Treemap(BaseChart):
             dy = [rect["dy"] for rect in level_rects]
             names = [rect["name"] for rect in level_rects]
 
-            if colorable:
+            if colorable and self.chart_properties.get("colormap", False):
                 colormap = mpl.colormaps[self.chart_properties["colormap"]]
                 color_value = (index + 1) / level_count
                 color = colormap(color_value)
