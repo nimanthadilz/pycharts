@@ -496,31 +496,39 @@ class Treemap(BaseChart):
 
         all_rectangles = []
         # draw the rectangles of the first level of nodes
-        level_rects = self.__get_rectangles(calculated_tree, 0, 0)
-        all_rectangles.append(copy.deepcopy(level_rects))
-        # self.__plot_rectangles(level_rects, 10000, colorable=True)
-        # pad the drawn rectangles
-        level_rects = self.__pad_rectangles(level_rects)
+        first_level_rects = self.__get_rectangles(calculated_tree, 0, 0)
+        all_rectangles.append(copy.deepcopy(first_level_rects))
+        # pad the calculated rectangles
+        first_level_rects = self.__pad_rectangles(first_level_rects)
 
         if (type(calculated_tree[1]) == tuple and len(calculated_tree[1])):
             queue = []
             for i in range(len(calculated_tree[1])):
-                queue.append((calculated_tree[1][i], level_rects[i]))
+                queue.append((calculated_tree[1][i], first_level_rects[i]))
 
 
             while len(queue) > 0:
-                node, rect = queue.pop(0)
 
-                # Draw the inner rectangles of the node
-                node_rects = self.__get_rectangles(node, rect["x"], rect["y"], rect["dx"], rect["dy"])
-                # self.__plot_rectangles(node_rects, rect["dx"]*rect["dy"], colorable=True)
-                all_rectangles.append(copy.deepcopy(node_rects))
-                node_rects = self.__pad_rectangles(node_rects)
+                current_level_rects = []
+                new_queue = []
+                while len(queue) > 0:
+                    node, rect = queue.pop(0)
 
-                # Add children nodes to the queue
-                if (type(node[1]) == tuple and len(node[1])):
-                    for i in range(len(node[1])):
-                        queue.append((node[1][i], node_rects[i]))
+                    # Draw the inner rectangles of the node
+                    node_rects = self.__get_rectangles(node, rect["x"], rect["y"], rect["dx"], rect["dy"])
+                    current_level_rects.extend(copy.deepcopy(node_rects))
+
+                    # Pad the rectangles
+                    node_rects = self.__pad_rectangles(node_rects)
+
+                    if (type(node[1]) == tuple and len(node[1])):
+                        for i in range(len(node[1])):
+                            new_queue.append((node[1][i], node_rects[i]))
+                
+                if len(current_level_rects):
+                    all_rectangles.append(current_level_rects)
+                if len(new_queue):
+                    queue.extend(new_queue)
 
             self.__plot_rectangles(all_rectangles, colorable=True)
 
