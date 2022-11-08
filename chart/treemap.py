@@ -448,46 +448,6 @@ class Treemap(BaseChart):
         if pad:
             return self.__pad_rectangles(rectangles, dx, dy)
         return rectangles
-
-    # def __plot_rectangles(self, rectangles, level, colorable=False):
-    #     """
-    #     Plots the given rectangles in the matplotlib.figure.Figure object.
-
-    #     Parameters
-    #     ----------
-    #     rectangles: list[rect]
-    #     colorable: boolean
-
-    #     Returns
-    #     -------
-    #     None
-    #     """
-    #     ax = self.figure.gca()
-
-    #     x = [rect["x"] for rect in rectangles]
-    #     y = [rect["y"] for rect in rectangles]
-    #     dx = [rect["dx"] for rect in rectangles]
-    #     dy = [rect["dy"] for rect in rectangles]
-    #     names = [rect["name"] for rect in rectangles]
-
-    #     if colorable:
-    #         # color = (random.random(), random.random(), random.random())
-    #         colormap = mpl.colormaps['Blues_r']
-    #         color_value = random.random()
-    #         # ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=color, align="edge")
-    #         ax.bar(x, dy, width=dx, linewidth=1, edgecolor='black', bottom=y, color=colormap(color_value) , align="edge")
-    #     else:
-    #         ax.bar(x, dy, width=dx, linewidth=1, bottom=y, color="white", align="edge")
-        
-    #     for i in range(len(rectangles)):
-    #         font = {
-    #             "family": self.chart_properties["chart_font_family"],
-    #             "size": self.chart_properties["chart_font_size"]
-    #         }
-    #         ax.text(x[i] + 1, y[i] + dy[i] - 3, names[i], fontdict=font)
-        
-    #     ax.set_xlim(0, 100)
-    #     ax.set_ylim(0, 100)
     
     def __plot_rectangles(self, rectangles_by_level, colorable=True):
         level_count = len(rectangles_by_level)
