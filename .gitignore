@@ -6,3 +6,6 @@ venv
 htmlcov
 output
 site/
+build/
+dist/
+app.spec
