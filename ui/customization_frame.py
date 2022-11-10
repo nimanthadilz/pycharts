@@ -67,7 +67,7 @@ class CustomizationFrame:
 
 
         # Colormap
-        colormap_label = customtkinter.CTkLabel(master=customization_frame, text="Color Range", text_font=("", 12)).grid(
+        colormap_label = customtkinter.CTkLabel(master=customization_frame, text="Color Map", text_font=("", 12)).grid(
             row=4, column=0, sticky=tk.W)
         colormaps = [
             'Greys',
