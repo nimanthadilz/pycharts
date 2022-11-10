@@ -8,6 +8,7 @@ from ui.output import Output
 from input_parser import Parser
 from chart_generator import ChartGenerator
 from ui.message_handler import MessageHandler
+import sys
 
 class App:
     def __init__(self, root):
@@ -91,8 +92,8 @@ class App:
 
 
 if __name__=="__main__":
-    # root = tk.Tk()
     root = customtkinter.CTk()
+    root.protocol("WM_DELETE_WINDOW", sys.exit)
     root.minsize(1480, 720)
     App(root)
     root.mainloop()
