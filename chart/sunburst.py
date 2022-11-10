@@ -605,12 +605,12 @@ class Sunburst(BaseChart):
         if len(path) == 0:
             color: List[float] = [1, 1, 1, 1]
         else:
+            color: List[float] = []
             angle = (self._angles[path].theta1 + self._angles[path].theta2) / 2
-            color = list(self.cmap(angle / 360))
-            for i in range(3):
-                color[i] += (
-                    (1 - color[i]) * 0.7 * (len(path) / (self._max_level + 1))
-                )
+            colormap = plt.colormaps[self.chart_properties['colormap']]
+            if angle < 270:
+                color = colormap(angle/360)
+            else:   color = colormap(angle/720)
         return tuple(color)
     
     def __alpha(self):
