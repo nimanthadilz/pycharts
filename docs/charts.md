@@ -19,4 +19,4 @@ Treemap represents a hierarchy using rectangles. Each rectangle corresponds to a
 
 ![Example Sunburst](img/example_sunburst.png)
 
-Sunburst represent a hierarchy using rings. Each ring corresponds to a level of the tree/hierarchy with the innermost circle as the root of the tree or top of the hierarchy and outmost circle as the leaf of the tree or bottom of the hierarchy. Each ring divides into the values of the nodes. The sunburst chart's radial layout makes efficient use of available space than the linear (horizontal or vertical) hierarchical representation. 
+Sunburst represent a hierarchy using rings. Each ring corresponds to a level of the tree/hierarchy with the innermost circle as the root of the tree or top of the hierarchy and outmost circle as leaves of the tree or bottom of the hierarchy. Each ring divides into the values of the nodes. The sunburst chart's radial layout makes efficient use of available space than the linear (horizontal or vertical) hierarchical representation. 
