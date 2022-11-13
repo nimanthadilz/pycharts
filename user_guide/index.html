@@ -55,11 +55,11 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#data-file-preparation">Data File Preparation</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#customize-charts">Customize Charts</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#export-charts">Export Charts</a>
-    </li>
         </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#customize-charts">Customize Charts</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#export-charts">Export Charts</a>
     </li>
     </ul>
                 </li>
@@ -92,10 +92,21 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="user-guide">User Guide</h1>
+<ul>
+<li><a href="./#installation">Installation</a></li>
+<li><a href="./#usage">Usage</a><ul>
+<li><a href="./#basic-usage">Basic Usage</a></li>
+<li><a href="./#data-file-preparation">Data File Preparation</a></li>
+</ul>
+</li>
+<li><a href="./#customize-charts">Customize Charts</a></li>
+<li><a href="./#export-charts">Export Charts</a></li>
+</ul>
 <h2 id="installation">Installation</h2>
+<p>TODO</p>
 <h2 id="usage">Usage</h2>
 <h3 id="basic-usage">Basic Usage</h3>
-<p>To generate a chart using PyCharts++, you need to provide a CSV data file in a pre-defined format to the program. See the <a href="">Data File Preparation</a> section for more information.</p>
+<p>To generate a chart using PyCharts++, you need to provide a CSV data file in a pre-defined format to the program. See the <a href="./#data-file-preparation">Data File Preparation</a> section for more information.</p>
 <p>You can select the data file by clicking on the <em>Select</em> button in the <em>Data</em> section of the <em>Sidebar</em>.</p>
 <p><img alt="select data file" src="../img/select_data_file.gif" /></p>
 <p>Select the <em>Chart Type</em> from the dropdown menu.</p>
@@ -103,8 +114,68 @@
 <p>Click <em>Generate</em> button to generate the chart.</p>
 <p><img alt="generate chart" src="../img/generate_chart.gif" /></p>
 <h3 id="data-file-preparation">Data File Preparation</h3>
-<h3 id="customize-charts">Customize Charts</h3>
-<h3 id="export-charts">Export Charts</h3>
+<p>The input data file to PyCharts++ should be a Comma Separated Values (CSV) file.</p>
+<p>The format of the file is as follows:</p>
+<ul>
+<li>There must be two columns named <em>name</em>, and <em>value</em>.</li>
+<li>Each entry in the file is a node in the hierarchy/tree.</li>
+<li>The name column of an entry is given such that it represents all the nodes up to that node from the root. The node names are separated by periods.<ul>
+<li>Example: <em>root.node1.node2.node3</em></li>
+</ul>
+</li>
+<li>The value column can be empty, an integer, or a float for a given entry. (Non-leaf nodes of the tree have empty values.)</li>
+<li>Whenever you use a node name inside the name of another node, that ancestor node must be defined before the new node.<ul>
+<li>Example: If you are entering <em>root.node1.node2</em> as an entry, there must be a previous entry as <em>root.node1</em>.</li>
+</ul>
+</li>
+<li>The name of each <strong>node</strong> must be unique. (Please note the term <strong>node</strong>.)<ul>
+<li>It means that if there is an entry as "<em>root.apple.orange.<strong>banana</strong></em>", there cannot be an entry as "<em>root.apple.<strong>banana</strong></em>".</li>
+</ul>
+</li>
+</ul>
+<p>A sample input data file is shown below.</p>
+<pre><code class="language-csv">name,value
+Countries,
+Countries.Asia,
+Countries.Asia.Sri Lanka,
+Countries.Asia.Sri Lanka.Negombo,100
+Countries.Asia.Sri Lanka.Colombo,280
+Countries.Asia.India,
+Countries.Asia.India.Mumbai,200
+Countries.Asia.India.Chennai,380
+Countries.Europe,
+Countries.Europe.Germany,
+Countries.Europe.Germany.Frankfurt,128
+Countries.Europe.Italy,
+Countries.Europe.Italy.Venice,110
+Countries.Europe.Italy.Rome,82
+</code></pre>
+<h2 id="customize-charts">Customize Charts</h2>
+<p>PyCharts++ offers few options to customize the charts generated.</p>
+<ul>
+<li>Title<ul>
+<li>You can enter a title for the generated chart.</li>
+</ul>
+</li>
+<li>Title font<ul>
+<li>You can set the title's font family and font size.</li>
+</ul>
+</li>
+<li>Chart font<ul>
+<li>You can change the font family and the font size of the text inside the chart.</li>
+</ul>
+</li>
+<li>Color Map<ul>
+<li>You can select a color map for the colors of the chart.</li>
+</ul>
+</li>
+</ul>
+<p>After setting the attributes, you need to click <em>Update</em> to update the chart.</p>
+<p><img alt="Customization options" src="../img/customization_section.png" /></p>
+<h2 id="export-charts">Export Charts</h2>
+<p>You can export the generated charts into Portable Network Graphic (PNG) format.</p>
+<p>To export, click <em>File</em> from the Menu, then click <em>Save as</em>. A dialog will appear to select the location to save the output.</p>
+<p><img alt="Export chart" src="../img/save_as.png" /></p>
               
             </div>
           </div><footer>
