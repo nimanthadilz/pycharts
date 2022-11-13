@@ -14,7 +14,7 @@ class ChartGenerator:
                 treemap = Treemap(data, chart_properties)
                 figure = treemap.get_figure()
             case "Sunburst":
-                sunburst = Sunburst(data)
+                sunburst = Sunburst(data, chart_properties)
                 figure = sunburst.get_figure()
             case "Icicle":
                 icicle = Icicle(data, chart_properties)

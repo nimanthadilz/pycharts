@@ -24,9 +24,20 @@ class CustomizationFrame:
         self.title_font_family = "Arial"
         self.title_font_size = 20
 
-        self.chart_font_string = tk.StringVar(customization_frame, "Arial 8")
+        self.chart_font_string = tk.StringVar(customization_frame, "Arial 11")
         self.chart_font_family = "Arial"
-        self.chart_font_size = 8
+        self.chart_font_size = 11
+
+        self.colormap = tk.StringVar(customization_frame, "Blues")
+
+        self.app.chart_properties = {
+            "title": self.title.get(),
+            "title_font_family": self.title_font_family,
+            "title_font_size": self.title_font_size,
+            "chart_font_family": self.chart_font_family,
+            "chart_font_size": self.chart_font_size,
+            "colormap": self.colormap.get()
+        }
 
         frame_title_label = customtkinter.CTkLabel(master=customization_frame, text="Customization", text_font=("", 14), anchor="w")
         frame_title_label.grid(row=0, column=0, sticky=(tk.W), padx=(20,0))
@@ -47,7 +58,7 @@ class CustomizationFrame:
 
 
         # Chart Font
-        font_label = customtkinter.CTkLabel(master=customization_frame, text="Font", text_font=("", 12)).grid(
+        font_label = customtkinter.CTkLabel(master=customization_frame, text="Chart Font", text_font=("", 12)).grid(
             row=3, column=0, sticky=tk.W)
         font_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled", textvariable=self.chart_font_string)
         font_entry.grid(row=3, column=1, sticky=(tk.W, tk.E))
@@ -55,13 +66,33 @@ class CustomizationFrame:
         font_select_btn.grid(row=3, column=2)
 
 
-        # Color
-        color_label = customtkinter.CTkLabel(master=customization_frame, text="Color Range", text_font=("", 12)).grid(
+        # Colormap
+        colormap_label = customtkinter.CTkLabel(master=customization_frame, text="Color Map", text_font=("", 12)).grid(
             row=4, column=0, sticky=tk.W)
-        color_entry = customtkinter.CTkEntry(master=customization_frame, text_font=("", 12), state="disabled")
-        color_entry.grid(row=4, column=1, sticky=(tk.W, tk.E))
-        color_select_btn = customtkinter.CTkButton(master=customization_frame, text="Change", text_font=("", 12))
-        color_select_btn.grid(row=4, column=2)
+        colormaps = [
+            'Greys',
+            'Purples',
+            'Blues',
+            'Greens',
+            'Oranges',
+            'Reds',
+            'YlOrBr',
+            'YlOrRd',
+            'OrRd',
+            'PuRd',
+            'RdPu',
+            'BuPu',
+            'GnBu',
+            'PuBu',
+            'YlGnBu',
+            'PuBuGn',
+            'BuGn',
+            'YlGn'
+        ]
+
+        colormap_entry = customtkinter.CTkComboBox(master=customization_frame, values=colormaps, variable=self.colormap, text_font=("", 12))
+        colormap_entry.configure(state="readonly", text_color="black")
+        colormap_entry.grid(row=4, column=1, sticky=(tk.W, tk.E))
 
         # update button
         update_btn = customtkinter.CTkButton(master=customization_frame, text="Update", text_font=("", 12), command=self.update_chart)
@@ -72,14 +103,15 @@ class CustomizationFrame:
         reset_btn.grid(row=5, column=1, sticky=(tk.W))
 
     def update_chart(self):
-        chart_properties = {
+        self.app.chart_properties = {
             "title": self.title.get(),
             "title_font_family": self.title_font_family,
             "title_font_size": self.title_font_size,
             "chart_font_family": self.chart_font_family,
-            "chart_font_size": self.chart_font_size
+            "chart_font_size": self.chart_font_size,
+            "colormap": self.colormap.get()
         }
-        self.app.update_chart(chart_properties)
+        self.app.update_chart()
 
     def __title_font_changed(self, font):
         font_properties = []

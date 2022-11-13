@@ -7,5 +7,8 @@ class MessageHandler:
     def show_message(self, message, type):
         if type=="Error":
             messagebox.showerror("Error", message)
+        elif type=="Info":
+            messagebox.showinfo("Info", message)
+            
         
 

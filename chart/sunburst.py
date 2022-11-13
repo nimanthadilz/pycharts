@@ -21,6 +21,7 @@ class Sunburst(BaseChart):
     Attributes
     ----------
     data: dictionary of type "Node" : (Value, "Parent")
+    chart_properties: dictionary type of title and chart font sizes and families
     axes:
     origin: coordinates of the center of the chart of type (float, float)
     cmap: controls the coloring based on the angle
@@ -40,6 +41,7 @@ class Sunburst(BaseChart):
     """
     def __init__(self,
                 data,
+                chart_properties: dict = {},
                 axes: Optional[plt.axes] = None,
                 origin = (0.0, 0.0),
                 cmap = plt.get_cmap("autumn"),
@@ -70,6 +72,14 @@ class Sunburst(BaseChart):
         self.label_minimal_angle = label_minimal_angle
         self.order = order
         self.base_textbox_props = base_textbox_props
+        if chart_properties:
+            self.chart_properties = chart_properties
+        else:
+            self.chart_properties = {
+                "title" : "",
+                "chart_font_family": "Arial",
+                "chart_font_size": 8
+            }
         
         if not base_textbox_props:
             self.base_textbox_props = dict(
@@ -91,6 +101,7 @@ class Sunburst(BaseChart):
         
         # Plot the chart 
         self.__plot(setup_axes=True)
+        self.__customize_chart()
     
     def get_figure(self):
         return self.figure
@@ -594,12 +605,12 @@ class Sunburst(BaseChart):
         if len(path) == 0:
             color: List[float] = [1, 1, 1, 1]
         else:
+            color: List[float] = []
             angle = (self._angles[path].theta1 + self._angles[path].theta2) / 2
-            color = list(self.cmap(angle / 360))
-            for i in range(3):
-                color[i] += (
-                    (1 - color[i]) * 0.7 * (len(path) / (self._max_level + 1))
-                )
+            colormap = plt.colormaps[self.chart_properties['colormap']]
+            if angle < 270:
+                color = colormap(angle/360)
+            else:   color = colormap(angle/720)
         return tuple(color)
     
     def __alpha(self):
@@ -698,7 +709,7 @@ class Sunburst(BaseChart):
             rotation = angle - 360
         else:
             raise ValueError
-
+        
         # to avoid the clashes with below levels, move the text further out
         if self.__is_outmost(path):
             if 0 <= angle < 90:
@@ -719,6 +730,11 @@ class Sunburst(BaseChart):
             ha = "center"
             va = "center"
 
+        font = {
+            "family": self.chart_properties["chart_font_family"],
+            "size": self.chart_properties["chart_font_size"]
+        }
+        
         text = self.__format_text(path)
         self.axes.text(
             mid_x,
@@ -727,7 +743,8 @@ class Sunburst(BaseChart):
             ha=ha,
             va=va,
             rotation=rotation,
-            bbox=self.__textbox_props(),
+            fontdict=font,
+            # bbox=self.__textbox_props(),
         )
     
     def __tangential_text(self, path: Path):
@@ -762,6 +779,11 @@ class Sunburst(BaseChart):
         else:
             raise ValueError
 
+        font = {
+            "family": self.chart_properties["chart_font_family"],
+            "size": self.chart_properties["chart_font_size"]
+        }
+        
         text = self.__format_text(path)
         self.axes.text(
             mid_x,
@@ -770,7 +792,8 @@ class Sunburst(BaseChart):
             ha="center",
             va="center",
             rotation=rotation,
-            bbox=self.__textbox_props(),
+            fontdict=font,
+            # bbox=self.__textbox_props(),
         )
     
     def __add_annotation(self, path):
@@ -809,7 +832,6 @@ class Sunburst(BaseChart):
         -------
         None
         """    
-        self.axes.set_title("Title")
         
         if not self.wedges:
             self.__prepare_data()
@@ -868,3 +890,22 @@ class Sunburst(BaseChart):
             fill=True,
             alpha=self.__alpha(),
         )
+    
+    def __customize_chart(self) -> None:
+        """
+        Customize title, title font family, and title font size
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+        """
+        
+        if self.chart_properties:
+            if "title" in self.chart_properties and self.chart_properties["title"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=20)
+            if self.chart_properties["title"] and self.chart_properties["title_font_family"] and self.chart_properties["title_font_size"]:
+                self.figure.suptitle(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"], fontfamily=self.chart_properties["title_font_family"])

@@ -1,3 +1,4 @@
+from tkinter.filedialog import asksaveasfilename
 import customtkinter
 import tkinter as tk
 from tkinter import ttk
@@ -7,6 +8,7 @@ from ui.output import Output
 from input_parser import Parser
 from chart_generator import ChartGenerator
 from ui.message_handler import MessageHandler
+import sys
 
 class App:
     def __init__(self, root):
@@ -14,6 +16,8 @@ class App:
         self.chart_generator = ChartGenerator()
         self.message_handler = MessageHandler(root)
         self.data = None
+        self.chart_properties = {}
+        self.figure = None
 
         root.title("PyCharts++")
         # below line throws an exception in linux 
@@ -27,6 +31,7 @@ class App:
         # File menu
         menu_bar.add_cascade(menu=menu_file, label="File")
         menu_file.add_command(label="New", command=self.menu_action, underline=0)
+        menu_file.add_command(label="Save as", command=self.__save_as, underline=0)
         menu_file.add_command(label="Exit", command=self.menu_action, underline=0)
         # Help menu
         menu_help = tk.Menu(menu_bar)
@@ -58,28 +63,37 @@ class App:
             try:
                 self.data = { "chart_type": chart_type.get(), "nodes": self.parser.parse(file_obj) }
                 self.parser.clear_nodes()
-                figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"])
-                self.output.show_chart(figure)
+                self.figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"], self.chart_properties)
+                self.output.show_chart(self.figure)
                 file_obj.close()
             except ParseError as e:
                 self.parser.clear_nodes()
                 self.message_handler.show_message(e.message, "Error")
 
-    def update_chart(self, chart_properties: dict):
+    def update_chart(self):
         if self.data == None:
             self.message_handler.show_message("No data has been read.", "Error")
             return
 
-        figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"], chart_properties)
-        self.output.show_chart(figure)
+        self.figure = self.chart_generator.generate_chart(self.data["chart_type"], self.data["nodes"], self.chart_properties)
+        self.output.show_chart(self.figure)
+
+    def __save_as(self):
+        filename = asksaveasfilename(initialfile="untitled.png", defaultextension=".png", filetypes=[("Portable Graphics Format", "*.png"), ("All files", "*.")])
+        if filename:
+            self.figure.savefig(filename)
+            self.message_handler.show_message("Successfully saved.", "Info")
+        else:
+            self.message_handler.show_message("Save location not selected.", "Error")
+
         
 
 
 
 
 if __name__=="__main__":
-    # root = tk.Tk()
     root = customtkinter.CTk()
+    root.protocol("WM_DELETE_WINDOW", sys.exit)
     root.minsize(1480, 720)
     App(root)
     root.mainloop()
