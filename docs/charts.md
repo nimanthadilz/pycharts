@@ -15,6 +15,10 @@ Treemap represents a hierarchy using rectangles. Each rectangle corresponds to a
 
 ## Icicle
 
+![Example Icicle](img/example_icicle.png)
+
+Icicle charts visualize a hierarchical data structure where rectangles are used to represent nodes of a hierarchical data set. The depth of the rectangles shows the depth of the nodes in the hierarchy they represent. The area of a rectangle depends on the value of the node itself and surrounding nodes.
+
 ## Sunburst
 
 ![Example Sunburst](img/example_sunburst.png)
