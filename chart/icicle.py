@@ -180,9 +180,9 @@ class Icicle(BaseChart):
                 # update the main array with coordinates
                 self.data_set[keys[index]] = [item[0], item[1], start_x, start_y, self._width, height]
                 # add text into the rectangle
-                self.ax.text(start_x + self._width / 3, start_y + height / 2, keys[index],
-                             color='black', fontsize=self.chart_properties["chart_font_size"],
-                             fontfamily=self.chart_properties["chart_font_family"])
+                self.ax.text(start_x  + 0.1, start_y +height -  0.8, keys[index],
+                             color='black', fontsize=self.chart_properties["chart_font_size"] if self.chart_properties["chart_font_size"] else 9,
+                             fontfamily=self.chart_properties["chart_font_family"] if self.chart_properties["chart_font_family"] else 'Arial')
 
                 index += 1
 
@@ -198,7 +198,8 @@ class Icicle(BaseChart):
         color = self.__calculate_color(self.data_set[keys[0]][0])
         self.__add_rectangle(0, 0, self._width, self._maxHeight, color)
 
-        self.ax.text(self._width / 3, self._maxHeight / 2, keys[0], color='black', fontsize=self.chart_properties["chart_font_size"],fontfamily=self.chart_properties["chart_font_family"])
+        self.ax.text(0 + 0.1, self._maxHeight - 0.8, keys[0], color='black', fontsize=self.chart_properties["chart_font_size"] if self.chart_properties["chart_font_size"] else 9,
+                             fontfamily=self.chart_properties["chart_font_family"] if self.chart_properties["chart_font_family"] else 'Arial')
 
         # update the list with width and height of the element
         self.data_set[keys[0]] = (self.data_set[keys[0]][0], self.data_set[keys[0]][1], 0, 0, 2, 20)
