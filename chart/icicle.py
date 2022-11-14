@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib.patches import Rectangle
 from chart.chart import BaseChart
 import sys
@@ -34,11 +35,10 @@ class Icicle(BaseChart):
     def __customize_chart(self):
         if self.chart_properties:
             if "title" in self.chart_properties and self.chart_properties["title"]:
-                plt.title(self.chart_properties["title"])
+                self.figure.suptitle(self.chart_properties["title"], fontsize=20)
             if self.chart_properties["title"] and self.chart_properties["title_font_family"] and self.chart_properties[
                 "title_font_size"]:
-                plt.title(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"],
-                          fontfamily=self.chart_properties["title_font_family"])
+                self.figure.suptitle(self.chart_properties["title"], fontsize=self.chart_properties["title_font_size"], fontfamily=self.chart_properties["title_font_family"])
 
     def __configure_chart(self, left_color="#8B008B", right_color="#FF00FF", element_width=1.5,
                           chart_height=20):
@@ -108,11 +108,15 @@ class Icicle(BaseChart):
             returns the color responding to the given value
         '''
         # converting the colors into int
-        color_l = int(self._color_l[1:], 16)
-        color_r = int(self._color_r[1:], 16)
+        if self.chart_properties.get("colormap", False):
+            colormap = mpl.colormaps[self.chart_properties["colormap"]]
+            color_l = 0.4
+            color_r = 0.9
 
-        return "#" + str(
-            hex(int((color_r * (value - self._min) + color_l * (self._max - value)) / (self._max - self._min)))[2:])
+            return colormap(
+                (color_r * (value - self._min) + color_l * (self._max - value)) / (self._max - self._min))
+        else:
+            return 'white'
 
     def __add_rectangle(self, start_x, start_y, width, height, color):
         '''
@@ -177,7 +181,7 @@ class Icicle(BaseChart):
                 self.data_set[keys[index]] = [item[0], item[1], start_x, start_y, self._width, height]
                 # add text into the rectangle
                 self.ax.text(start_x + self._width / 3, start_y + height / 2, keys[index],
-                             color='white', fontsize=self.chart_properties["chart_font_size"],
+                             color='black', fontsize=self.chart_properties["chart_font_size"],
                              fontfamily=self.chart_properties["chart_font_family"])
 
                 index += 1
@@ -194,7 +198,7 @@ class Icicle(BaseChart):
         color = self.__calculate_color(self.data_set[keys[0]][0])
         self.__add_rectangle(0, 0, self._width, self._maxHeight, color)
 
-        self.ax.text(self._width / 3, self._maxHeight / 2, keys[0], color='white', fontsize=8)
+        self.ax.text(self._width / 3, self._maxHeight / 2, keys[0], color='black', fontsize=self.chart_properties["chart_font_size"],fontfamily=self.chart_properties["chart_font_family"])
 
         # update the list with width and height of the element
         self.data_set[keys[0]] = (self.data_set[keys[0]][0], self.data_set[keys[0]][1], 0, 0, 2, 20)
