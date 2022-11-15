@@ -85,6 +85,9 @@ class App:
             self.message_handler.show_message("Successfully saved.", "Info")
         else:
             self.message_handler.show_message("Save location not selected.", "Error")
+    
+    def reset_chart(self):
+        self.output.reset()
 
         
 

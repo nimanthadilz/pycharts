@@ -99,7 +99,7 @@ class CustomizationFrame:
         update_btn.grid(row=5, column=0)
 
         # reset button
-        reset_btn = customtkinter.CTkButton(master=customization_frame, text="Reset", text_font=("", 12))
+        reset_btn = customtkinter.CTkButton(master=customization_frame, text="Reset", text_font=("", 12), command=self.__reset)
         reset_btn.grid(row=5, column=1, sticky=(tk.W))
 
     def update_chart(self):
@@ -154,5 +154,8 @@ class CustomizationFrame:
     def __show_chart_font_selector(self):
         self.root.tk.call("tk", "fontchooser", "configure", "-font", f"{{{self.chart_font_family}}} {self.chart_font_size}", "-command", self.root.register(self.__chart_font_changed))
         self.root.tk.call("tk", "fontchooser", "show")
+
+    def __reset(self):
+        self.app.reset_chart()
         
 
