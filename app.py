@@ -32,7 +32,7 @@ class App:
         # File menu
         menu_bar.add_cascade(menu=menu_file, label="File")
         menu_file.add_command(label="Save as", command=self.__save_as, underline=0)
-        menu_file.add_command(label="Exit", command=root.destroy, underline=0)
+        menu_file.add_command(label="Exit", command=sys.exit, underline=0)
         # Help menu
         menu_help = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=menu_help, label="Help")
