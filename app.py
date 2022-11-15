@@ -78,6 +78,9 @@ class App:
         self.output.show_chart(self.figure)
 
     def __save_as(self):
+        if not self.figure:
+            self.message_handler.show_message("Canvas is empty.", "Error")
+            return
         filename = asksaveasfilename(initialfile="untitled.png", defaultextension=".png", filetypes=[("Portable Graphics Format", "*.png"), ("All files", "*.")])
         if filename:
             self.figure.savefig(filename)
@@ -86,6 +89,7 @@ class App:
             self.message_handler.show_message("Save location not selected.", "Error")
     
     def reset_chart(self):
+        self.figure = None
         self.output.reset()
 
     def __open_documentation(self):
