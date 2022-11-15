@@ -70,6 +70,9 @@ class App:
                 self.message_handler.show_message(e.message, "Error")
 
     def update_chart(self):
+        if self.figure == None:
+            self.message_handler.show_message("Canvas is empty.", "Error")
+            return
         if self.data == None:
             self.message_handler.show_message("No data has been read.", "Error")
             return
