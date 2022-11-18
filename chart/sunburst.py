@@ -1,5 +1,6 @@
 import collections
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 from itertools import groupby
@@ -22,9 +23,7 @@ class Sunburst(BaseChart):
     ----------
     data: dictionary of type "Node" : (Value, "Parent")
     chart_properties: dictionary type of title and chart font sizes and families
-    axes:
     origin: coordinates of the center of the chart of type (float, float)
-    cmap: controls the coloring based on the angle
     base_ring_width: default width of a wedge as float
     base_edge_color: default edge color of a wedge as tuple 
     base_line_width: default line width of a wedge as float
@@ -42,17 +41,7 @@ class Sunburst(BaseChart):
     def __init__(self,
                 data,
                 chart_properties: dict = {},
-                axes: Optional[plt.axes] = None,
-                origin = (0.0, 0.0),
-                cmap = plt.get_cmap("autumn"),
-                base_ring_width = 0.4, 
-                base_edge_color = (0, 0, 0, 1),
-                base_line_width = 0.75,
-                plot_center = False,
-                plot_minimal_angle = 0, 
-                label_minimal_angle = 0,
-                order = "value reverse",
-                base_textbox_props = None,
+                axes: Optional[plt.Axes] = None,
         ):
         super().__init__(data)
         
@@ -62,16 +51,15 @@ class Sunburst(BaseChart):
         self.figure, self.axes = plt.subplots()
         
         self.data = self.__dict_to_pv(self.__convert_data(data))
-        self.cmap = cmap
-        self.origin = origin
-        self.base_wedge_width = base_ring_width
-        self.base_edge_color = base_edge_color
-        self.base_line_width = base_line_width
-        self.plot_center = plot_center
-        self.plot_minimal_angle = plot_minimal_angle
-        self.label_minimal_angle = label_minimal_angle
-        self.order = order
-        self.base_textbox_props = base_textbox_props
+        self.origin = (0.0, 0.0)
+        self.base_wedge_width = 0.4
+        self.base_edge_color = (0, 0, 0, 1)
+        self.base_line_width = 0.75
+        self.plot_center = False
+        self.plot_minimal_angle = 0
+        self.label_minimal_angle = 0
+        self.order = "value reverse"
+        
         if chart_properties:
             self.chart_properties = chart_properties
         else:
@@ -81,13 +69,6 @@ class Sunburst(BaseChart):
                 "chart_font_size": 8
             }
         
-        if not base_textbox_props:
-            self.base_textbox_props = dict(
-                boxstyle="round, pad=0.2",
-                fc=(1, 1, 1, 0.8),
-                ec=(0.4, 0.4, 0.4, 1),
-                lw=0.0,
-            )
             
         # Variables
         self._completed_pv = {}  # type: Dict[Path, float]
@@ -100,7 +81,7 @@ class Sunburst(BaseChart):
         self.wedges = {}  # type: Dict[Path, Wedge]
         
         # Plot the chart 
-        self.__plot(setup_axes=True)
+        self.__plot()
         self.__customize_chart()
     
     def get_figure(self):
@@ -483,7 +464,7 @@ class Sunburst(BaseChart):
     def __wedge_width(self):
         """
         The width of the wedge corresponding to `path`
-        sets to 0.75
+        sets to 0.4
         
         Parameters
         ----------
@@ -605,29 +586,16 @@ class Sunburst(BaseChart):
         if len(path) == 0:
             color: List[float] = [1, 1, 1, 1]
         else:
+            
             color: List[float] = []
             angle = (self._angles[path].theta1 + self._angles[path].theta2) / 2
-            colormap = plt.colormaps[self.chart_properties['colormap']]
+            
+            colormap = mpl.colormaps[self.chart_properties['colormap']]
+            # colormap = plt.get_cmap(self.chart_properties["colormap"])
             if angle < 270:
                 color = colormap(angle/360)
             else:   color = colormap(angle/720)
         return tuple(color)
-    
-    def __alpha(self):
-        return 1
-    
-    def __textbox_props(self):
-        """
-        Properties of the textbox (bbox) that annotating the wedge corresponding to `path`
-        
-        Parameters
-        ----------
-        None
-        
-        Returns
-        dictionary of keyword properties for the bbox option 
-        """
-        return self.base_textbox_props
     
     def __format_path_text(self, path):
         """
@@ -825,8 +793,7 @@ class Sunburst(BaseChart):
         Parameters
         ----------
         
-        set_up_axes: bool, Basic setup for the axes
-        interactive: bool, Display label for the wedge under the cursor only.
+        None
         
         Returns
         -------
@@ -838,32 +805,14 @@ class Sunburst(BaseChart):
         
         for path, wedge in self.wedges.items():
             self.axes.add_patch(wedge)
-            if not interactive:
-                self.__add_annotation(path)
+            self.__add_annotation(path)
         
-        if setup_axes:
-            self.axes.autoscale()
-            self.axes.set_aspect("equal")
-            self.axes.autoscale_view(True, True, True)
-            self.axes.axis("off")
-            self.axes.margins(x=0.1, y=0.1)
+        self.axes.autoscale()
+        self.axes.set_aspect("equal")
+        self.axes.autoscale_view(True, True, True)
+        self.axes.axis("off")
+        self.axes.margins(x=0.1, y=0.1)
             
-        if interactive:
-            def hover(event):
-                if event.inaxes == self.axes:
-                    found = False
-                    for path in self.wedges:
-                        if not found:
-                            cont, ind = self.wedges[path].contains(event)
-                        else:
-                            cont = False
-                        if cont:
-                            self.wedges[path].set_alpha(0.5)
-                            self.axes.set_title(self.__format_text(path))
-                        else:
-                            self.wedges[path].set_alpha(1.0)
-                    self.axes.figure.canvas.draw_idle()
-            self.axes.figure.canvas.mpl_connect("motion_notify_event", hover)
     
     def __wedge(self, path: Path) -> Wedge:
         """
@@ -882,13 +831,13 @@ class Sunburst(BaseChart):
             self.__wedge_outer_radius(path),
             self._angles[path].theta1,
             self._angles[path].theta2,
-            width=self.__wedge_width(),
-            label=self.__format_text(path),
-            facecolor=self.__face_color(path),
-            edgecolor=self.__edge_color(),
-            linewidth=self.__line_width(),
-            fill=True,
-            alpha=self.__alpha(),
+            width = self.__wedge_width(),
+            label = self.__format_text(path),
+            facecolor = self.__face_color(path),
+            edgecolor = self.__edge_color(),
+            linewidth = self.__line_width(),
+            fill = True,
+            alpha = 1,
         )
     
     def __customize_chart(self) -> None:
