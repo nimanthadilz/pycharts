@@ -8,7 +8,11 @@
 - [Export Charts](user_guide.md#export-charts)
 
 ## Installation
-TODO
+The executable software can be downloaded from the [releases page of our Github page](https://github.com/pycharts/pycharts/releases). Make sure to download the correct zip file according to your operating system.
+
+Extract the downloaded zip file. Then run the executable file named "app" inside the app folder.
+
+![releases page](img/releases_page.png)
 ## Usage
 
 ### Basic Usage

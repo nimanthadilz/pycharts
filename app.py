@@ -9,6 +9,7 @@ from input_parser import Parser
 from chart_generator import ChartGenerator
 from ui.message_handler import MessageHandler
 import sys
+import webbrowser
 
 class App:
     def __init__(self, root):
@@ -30,14 +31,12 @@ class App:
         menu_file = tk.Menu(menu_bar)
         # File menu
         menu_bar.add_cascade(menu=menu_file, label="File")
-        menu_file.add_command(label="New", command=self.menu_action, underline=0)
         menu_file.add_command(label="Save as", command=self.__save_as, underline=0)
-        menu_file.add_command(label="Exit", command=self.menu_action, underline=0)
+        menu_file.add_command(label="Exit", command=sys.exit, underline=0)
         # Help menu
         menu_help = tk.Menu(menu_bar)
         menu_bar.add_cascade(menu=menu_help, label="Help")
-        menu_help.add_command(label="Tutorial", command=self.menu_action, underline=0)
-        menu_help.add_command(label="About", command=self.menu_action, underline=0)
+        menu_help.add_command(label="Documentation", command=self.__open_documentation, underline=0)
 
         main_frame = customtkinter.CTkFrame(master=root)
         main_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S), padx=3, pady=12)
@@ -71,6 +70,9 @@ class App:
                 self.message_handler.show_message(e.message, "Error")
 
     def update_chart(self):
+        if self.figure == None:
+            self.message_handler.show_message("Canvas is empty.", "Error")
+            return
         if self.data == None:
             self.message_handler.show_message("No data has been read.", "Error")
             return
@@ -79,12 +81,23 @@ class App:
         self.output.show_chart(self.figure)
 
     def __save_as(self):
+        if not self.figure:
+            self.message_handler.show_message("Canvas is empty.", "Error")
+            return
         filename = asksaveasfilename(initialfile="untitled.png", defaultextension=".png", filetypes=[("Portable Graphics Format", "*.png"), ("All files", "*.")])
         if filename:
             self.figure.savefig(filename)
             self.message_handler.show_message("Successfully saved.", "Info")
         else:
             self.message_handler.show_message("Save location not selected.", "Error")
+    
+    def reset_chart(self):
+        self.figure = None
+        self.output.reset()
+
+    def __open_documentation(self):
+        docs_url = "https://pycharts.github.io/pycharts"
+        webbrowser.open(docs_url)
 
         
 

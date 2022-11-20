@@ -30,4 +30,10 @@ class Output:
         self.figure_canvas.get_tk_widget().grid(row=0, column=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.figure_canvas.draw()
 
+    def reset(self):
+        figure = Figure(figsize=(8, 6), dpi=100, edgecolor="black", linewidth=1)
+        self.figure_canvas = FigureCanvasTkAgg(figure, master=self.outputFrame)
+        self.figure_canvas.get_tk_widget().grid(row=0, column=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.figure_canvas.draw()
+
 
