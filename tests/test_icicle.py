@@ -20,8 +20,15 @@ class TestIciclemap(unittest.TestCase):
         self.assertEqual(self.icicle._Icicle__calculate_color(1280), 'white', "Should equal to white")
 
     def test_duplicate_object(self):
-        dup_data = self.icicle._Icicle__duplicate_object(self.data)
-        self.assertEqual(dup_data,self.data)
+        data = {
+            "Documents": (None, None),
+            "School": (None, "Documents"),
+            "Assignment": (100, "School"),
+            "Personal": (None, "Documents"),
+            "CV": (200, "Personal")
+        }
+        dup_data = self.icicle._Icicle__duplicate_object(data)
+        self.assertEqual(dup_data,data)
 
     def test_calculate_color_middle_value(self):
         self.min = 100
