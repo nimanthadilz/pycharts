@@ -66,10 +66,10 @@ class Sunburst(BaseChart):
             self.chart_properties = {
                 "title" : "",
                 "chart_font_family": "Arial",
-                "chart_font_size": 8
+                "chart_font_size": 8,
+                "colormap": "Blues"
             }
         
-            
         # Variables
         self._completed_pv = {}  # type: Dict[Path, float]
         self._completed_paths = []  # type: List[Path]
@@ -589,12 +589,11 @@ class Sunburst(BaseChart):
             
             color: List[float] = []
             angle = (self._angles[path].theta1 + self._angles[path].theta2) / 2
-            
-            colormap = mpl.colormaps[self.chart_properties['colormap']]
-            # colormap = plt.get_cmap(self.chart_properties["colormap"])
-            if angle < 270:
-                color = colormap(angle/360)
+            colormap = mpl.colormaps[self.chart_properties["colormap"]]                            
+            # cmap = plt.get_cmap(self.chart_properties["colormap"])
+            if angle < 270: color = colormap(angle/360)
             else:   color = colormap(angle/720)
+        print(len(color))
         return tuple(color)
     
     def __format_path_text(self, path):
