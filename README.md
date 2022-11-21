@@ -12,3 +12,13 @@ Read our documentation from [here](https://pycharts.github.io/pycharts/).
 - Icicle
 - Sunburst
 
+## Setup
+To run the program from code follow the instructions below:
+- You must have Python 3.10 or above installed on your computer.
+- Clone the repository to your local machine.
+- Create a virtual environment for the PyCharts++ project.
+- While inside the virtual environment run the following command to install all the requirements for this application:
+
+  ```pip install -r requirements.txt```
+- Run the application with ```python app.py``` command while inside the project folder.
+

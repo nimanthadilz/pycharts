@@ -103,6 +103,9 @@ class Icicle(BaseChart):
         self._max = self.data_set[keys[0]][0] if self._max < self.data_set[keys[0]][0] else self._max
         self._min = self.data_set[keys[0]][0] if self._min > self.data_set[keys[0]][0] else self._min
 
+    def __calculate_index(self,color_r,color_l,value):
+        return (color_r * (value - self._min) + color_l * (self._max - value)) / (self._max - self._min)
+
     def __calculate_color(self, value):
         '''
             returns the color responding to the given value
@@ -113,8 +116,7 @@ class Icicle(BaseChart):
             color_l = 0.4
             color_r = 0.9
 
-            return colormap(
-                (color_r * (value - self._min) + color_l * (self._max - value)) / (self._max - self._min))
+            return colormap(self.__calculate_index(color_r,color_l,value))
         else:
             return 'white'
 
