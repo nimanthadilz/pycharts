@@ -593,7 +593,6 @@ class Sunburst(BaseChart):
             # cmap = plt.get_cmap(self.chart_properties["colormap"])
             if angle < 270: color = colormap(angle/360)
             else:   color = colormap(angle/720)
-        print(len(color))
         return tuple(color)
     
     def __format_path_text(self, path):
