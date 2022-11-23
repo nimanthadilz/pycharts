@@ -1,5 +1,4 @@
 import unittest
-from matplotlib.patches import Wedge
 from chart.sunburst import Sunburst
 from chart.sunburst_path import Path
 
@@ -55,7 +54,7 @@ class TestSunburst(unittest.TestCase):
         self.assertEqual(self.sunburst._Sunburst__dict_to_pv(data), {Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )): 10, Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )): 15, Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )): 22}, "Should be equal to {Path(('Root', 'Grand Parent1', 'Parent1', 'Child1', )): 10, Path(('Root', 'Grand Parent1', 'Parent2', 'Child2', )): 15, Path(('Root', 'Grand Parent2', 'Parent3', 'Child3', )): 22}")
         
     def test_wedge_width(self):
-        self.assertEqual(self.sunburst._Sunburst__wedge_width(), self.sunburst.base_wedge_width, "Should be equal to 0.75")
+        self.assertEqual(self.sunburst._Sunburst__wedge_width(), self.sunburst.base_wedge_width, "Should be equal to 0.4")
         
     def test_wedge_spacing(self):
         self.assertEqual(self.sunburst._Sunburst__wedge_spacing(), (0, 0), "Should be equal to (0, 0)")
